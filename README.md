@@ -12,7 +12,7 @@ Eight tiny games docked at the bottom-left of the [DeepSeek Harness](https://git
 | **Klotski** | Select a block, then click a target cell or use arrow keys. Put Cao Cao on the bottom-centre exit to win. |
 | **Snake** | Arrow keys / `WASD`, `P` pause, `Space` restart. |
 | **Schulte table** | Tap 1→25 in order. Progress / time / best are shown; the remaining numbers reshuffle every 4 s. The board can be a square grid or a rotating circle (numbers stay upright). |
-| **Sokoban** | Arrow keys / `WASD` walk and push, `R` resets the level. Push every crate onto a target; four bundled levels advance automatically. |
+| **Sokoban** | Classic 100-level Sokoban pack (16×16 XSB-style maps). Arrow keys / `WASD` walk and push, `R` resets the level; each solved level advances to the next. |
 | **Breakout** | Drag the paddle with the mouse/touch (pointer capture keeps it following outside the field), or hold `←` `→` / `A` `D`. `Space` serves, `P` pauses. Six staggered rows of bricks. |
 
 ## Install
@@ -42,7 +42,7 @@ The Host half listens to `agent/status` and serves `GET /api/dsh-casual-games/st
 ```bash
 npm test
 # or individually
-node scripts/verify-games-logic.mjs   # 122 pure-logic assertions across all games (incl. Sokoban BFS solvability)
+node scripts/verify-games-logic.mjs   # 118 pure-logic assertions across all games (incl. Sokoban pack validation + one BFS solve)
 node scripts/smoke-render.mjs         # renders components with a minimal hook runtime
 node scripts/verify-host-status.mjs   # host route: running / longRunning / idle / 405
 ```
