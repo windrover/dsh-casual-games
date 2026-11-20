@@ -4,10 +4,10 @@
  * Sections: card shell styles · 2048 · Tetris · Gomoku · Klotski · Snake ·
  *           Schulte table · Breakout · card shell component · host bridge.
  * The Host half (index.js) watches `agent/status` and serves
- * /api/dsh-games/status; the card auto-expands during long agent runs.
+ * /api/dsh-casual-games/status; the card auto-expands during long agent runs.
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-games',
+  id: 'dsh-casual-games',
   factory(require) {
     const React = require('react');
     const h = React.createElement;
@@ -2697,9 +2697,361 @@ window.__ModuleLoader__.load({
       ]);
     }
 
+    // ┌──────────────────────────────────────────────────────────────┐
+    // │ Sokoban (推箱子)                                             │
+    // └──────────────────────────────────────────────────────────────┘
+    const SOKOBAN_LEVELS = [
+      [
+        '#######',
+        '#     #',
+        '#  .  #',
+        '#  $  #',
+        '#  @  #',
+        '#######',
+      ],
+      [
+        '########',
+        '#      #',
+        '# .  . #',
+        '# $  $ #',
+        '#  @   #',
+        '########',
+      ],
+      [
+        '#########',
+        '#       #',
+        '#  $ .  #',
+        '#  @    #',
+        '#       #',
+        '#########',
+      ],
+      [
+        '#########',
+        '#   #   #',
+        '# . # . #',
+        '# $   $ #',
+        '#   @   #',
+        '#########',
+      ],
+    ];
+
+    function sokobanParse(levelIndex) {
+      const index = Math.max(0, Math.min(SOKOBAN_LEVELS.length - 1, Number(levelIndex) || 0));
+      const rows = SOKOBAN_LEVELS[index];
+      const cols = rows.reduce((max, line) => Math.max(max, line.length), 0);
+      const walls = [];
+      const targets = [];
+      const boxes = [];
+      let player = { r: 1, c: 1 };
+      for (let r = 0; r < rows.length; r += 1) {
+        const line = rows[r];
+        for (let c = 0; c < cols; c += 1) {
+          const ch = line[c] || ' ';
+          if (ch === '#') walls.push({ r, c });
+          if (ch === '.' || ch === '*' || ch === '+') targets.push({ r, c });
+          if (ch === '$' || ch === '*') boxes.push({ r, c });
+          if (ch === '@' || ch === '+') player = { r, c };
+        }
+      }
+      return { rows: rows.length, cols, walls, targets, boxes, player };
+    }
+
+    const sokobanKey = (cell) => `${cell.r},${cell.c}`;
+
+    function sokobanWalls(parsed) {
+      return new Set(parsed.walls.map(sokobanKey));
+    }
+
+    function sokobanTargets(parsed) {
+      return new Set(parsed.targets.map(sokobanKey));
+    }
+
+    function sokobanIsSolved(state) {
+      if (!state.boxes.length) return false;
+      const parsed = sokobanParse(state.level);
+      const targets = sokobanTargets(parsed);
+      return state.boxes.every((box) => targets.has(sokobanKey(box)));
+    }
+
+    function sokobanBoard(level) {
+      const parsed = sokobanParse(level);
+      return {
+        level,
+        player: { ...parsed.player },
+        boxes: parsed.boxes.map((box) => ({ ...box })),
+        moves: 0,
+        solved: false,
+      };
+    }
+
+    function freshSokobanState(best) {
+      const bestMoves = Array.isArray(best)
+        ? best.slice(0, SOKOBAN_LEVELS.length).map((value) => (Number(value) > 0 ? Number(value) : null))
+        : SOKOBAN_LEVELS.map(() => null);
+      return { ...sokobanBoard(0), best: bestMoves };
+    }
+
+    function sanitizeSokoban(state) {
+      const level = state && Number.isInteger(state.level)
+        ? Math.max(0, Math.min(SOKOBAN_LEVELS.length - 1, state.level))
+        : 0;
+      const best = Array.isArray(state && state.best) ? state.best : [];
+      const bestMoves = SOKOBAN_LEVELS.map((_, index) => {
+        const value = Number(best[index]);
+        return value > 0 ? value : null;
+      });
+      return { ...sokobanBoard(level), best: bestMoves };
+    }
+
+    function sokobanMove(state, dr, dc) {
+      if (state.solved) return state;
+      const parsed = sokobanParse(state.level);
+      const walls = sokobanWalls(parsed);
+      const targets = sokobanTargets(parsed);
+      const next = { r: state.player.r + dr, c: state.player.c + dc };
+      if (!Number.isInteger(next.r) || !Number.isInteger(next.c)) return state;
+      if (next.r < 0 || next.c < 0 || next.r >= parsed.rows || next.c >= parsed.cols) return state;
+      if (walls.has(sokobanKey(next))) return state;
+
+      const boxes = state.boxes.map((box) => ({ ...box }));
+      const boxIndex = boxes.findIndex((box) => box.r === next.r && box.c === next.c);
+      if (boxIndex >= 0) {
+        const push = { r: next.r + dr, c: next.c + dc };
+        if (push.r < 0 || push.c < 0 || push.r >= parsed.rows || push.c >= parsed.cols) return state;
+        if (walls.has(sokobanKey(push))) return state;
+        if (boxes.some((box) => box.r === push.r && box.c === push.c)) return state;
+        boxes[boxIndex] = push;
+      }
+
+      const moves = state.moves + 1;
+      const solved = boxes.length > 0 && boxes.every((box) => targets.has(sokobanKey(box)));
+      const best = state.best ? state.best.slice() : SOKOBAN_LEVELS.map(() => null);
+      if (solved) {
+        const current = best[state.level];
+        best[state.level] = current ? Math.min(current, moves) : moves;
+      }
+      return {
+        ...state,
+        player: next,
+        boxes,
+        moves,
+        solved,
+        best,
+      };
+    }
+
+    function sokobanReset(state) {
+      return { ...sokobanBoard(state.level), best: state.best ? state.best.slice() : SOKOBAN_LEVELS.map(() => null) };
+    }
+
+    function sokobanNext(state) {
+      const level = (state.level + 1) % SOKOBAN_LEVELS.length;
+      return { ...sokobanBoard(level), best: state.best ? state.best.slice() : SOKOBAN_LEVELS.map(() => null) };
+    }
+
+    const sokobanBoardStyle = {
+      position: 'relative',
+      flexShrink: 0,
+      display: 'grid',
+      background: '#1b2026',
+      borderRadius: 6,
+      border: '1px solid var(--dsw-alias-border-l1)',
+      overflow: 'hidden',
+      touchAction: 'none',
+    };
+
+    function GameSokoban({ initial, onChange, focused, active = true }) {
+      const [state, setState] = useState(() => sanitizeSokoban(initial) || freshSokobanState([]));
+      const stateRef = useRef(state);
+      const onChangeRef = useRef(onChange);
+      const touch = useRef(null);
+
+      useEffect(() => {
+        onChangeRef.current = onChange;
+      }, [onChange]);
+
+      useEffect(() => {
+        stateRef.current = state;
+      }, [state]);
+
+      const commit = useCallback((next, notify) => {
+        if (next === stateRef.current) return;
+        stateRef.current = next;
+        setState(next);
+        if (notify && onChangeRef.current) onChangeRef.current(next);
+      }, []);
+
+      const move = useCallback((dr, dc) => {
+        if (!active) return;
+        commit(sokobanMove(stateRef.current, dr, dc), true);
+      }, [active, commit]);
+
+      const restart = useCallback(() => {
+        commit(sokobanReset(stateRef.current), true);
+      }, [commit]);
+
+      useEffect(() => {
+        if (!focused || !active) return undefined;
+        const onKeyDown = (event) => {
+          const key = event.key;
+          if (key === 'ArrowLeft' || key === 'a' || key === 'A') { event.preventDefault(); move(0, -1); return; }
+          if (key === 'ArrowRight' || key === 'd' || key === 'D') { event.preventDefault(); move(0, 1); return; }
+          if (key === 'ArrowUp' || key === 'w' || key === 'W') { event.preventDefault(); move(-1, 0); return; }
+          if (key === 'ArrowDown' || key === 's' || key === 'S') { event.preventDefault(); move(1, 0); return; }
+          if (key === 'r' || key === 'R') { event.preventDefault(); restart(); }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+      }, [focused, active, move, restart]);
+
+      const onTouchStart = useCallback((event) => {
+        const point = event.touches[0];
+        if (point) touch.current = { x: point.clientX, y: point.clientY };
+      }, []);
+
+      const onTouchEnd = useCallback((event) => {
+        const start = touch.current;
+        touch.current = null;
+        const point = event.changedTouches[0];
+        if (!start || !point) return;
+        const dx = point.clientX - start.x;
+        const dy = point.clientY - start.y;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+        if (Math.abs(dx) > Math.abs(dy)) move(0, dx > 0 ? 1 : -1);
+        else move(dy > 0 ? 1 : -1, 0);
+      }, [move]);
+
+      const parsed = sokobanParse(state.level);
+      const tile = Math.min(
+        Math.floor(200 / parsed.cols),
+        Math.floor(210 / parsed.rows),
+        28,
+      );
+      const targets = sokobanTargets(parsed);
+      const walls = sokobanWalls(parsed);
+      const boxes = new Set(state.boxes.map(sokobanKey));
+
+      const cells = [];
+      for (let r = 0; r < parsed.rows; r += 1) {
+        for (let c = 0; c < parsed.cols; c += 1) {
+          const key = `${r},${c}`;
+          const isWall = walls.has(key);
+          const isTarget = targets.has(key);
+          const isBox = boxes.has(key);
+          const isPlayer = state.player.r === r && state.player.c === c;
+          const boxOnTarget = isBox && isTarget;
+          cells.push(h('div', {
+            key,
+            style: {
+              position: 'relative',
+              width: tile,
+              height: tile,
+              background: isWall ? '#3a3f46' : 'transparent',
+              boxSizing: 'border-box',
+              border: isWall ? '1px solid #2b2f35' : 'none',
+            },
+          }, [
+            isTarget
+              ? h('div', {
+                  key: 'target',
+                  style: {
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    width: Math.max(4, tile * 0.28),
+                    height: Math.max(4, tile * 0.28),
+                    marginLeft: -Math.max(4, tile * 0.28) / 2,
+                    marginTop: -Math.max(4, tile * 0.28) / 2,
+                    borderRadius: '50%',
+                    background: '#ffd166',
+                    opacity: 0.8,
+                  },
+                })
+              : null,
+            isBox
+              ? h('div', {
+                  key: 'box',
+                  style: {
+                    position: 'absolute',
+                    left: 2,
+                    top: 2,
+                    right: 2,
+                    bottom: 2,
+                    borderRadius: 3,
+                    background: boxOnTarget ? '#4cd964' : '#c58b4a',
+                    border: '1px solid rgba(0,0,0,0.35)',
+                    boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.35)',
+                  },
+                })
+              : null,
+            isPlayer
+              ? h('div', {
+                  key: 'player',
+                  style: {
+                    position: 'absolute',
+                    left: '18%',
+                    top: '18%',
+                    width: '64%',
+                    height: '64%',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle at 34% 28%, #9fd0ff 0%, #4aa3ff 45%, #1f6fbf 100%)',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                  },
+                })
+              : null,
+          ]));
+        }
+      }
+
+      return h('div', {
+        style: { display: 'flex', flexDirection: 'column', height: '100%' },
+        onTouchStart,
+        onTouchEnd,
+      }, [
+        h('div', { key: 'chips' }, chips([
+          { label: '关卡', value: `${state.level + 1}/${SOKOBAN_LEVELS.length}` },
+          { label: '步数', value: state.moves },
+          { label: '最佳', value: state.best && state.best[state.level] ? state.best[state.level] : '—' },
+        ])),
+        h('div', {
+          key: 'wrap',
+          style: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        }, h('div', {
+          key: 'board',
+          style: {
+            ...sokobanBoardStyle,
+            width: parsed.cols * tile,
+            height: parsed.rows * tile,
+            gridTemplateColumns: `repeat(${parsed.cols}, ${tile}px)`,
+            gridTemplateRows: `repeat(${parsed.rows}, ${tile}px)`,
+          },
+          title: '方向键 / WASD 移动并推箱，R 重置本关',
+        }, [
+          ...cells,
+          state.solved
+            ? h('div', { key: 'done', style: overlayStyle('rgba(12, 18, 26, 0.86)', '#ffffff') }, [
+                h('div', { key: 'title', style: { marginBottom: 4 } }, '过关！'),
+                h('div', { key: 'moves', style: { fontSize: 10, marginBottom: 8, fontWeight: 500 } },
+                  `${state.moves} 步 · 最佳 ${state.best[state.level]} 步`),
+                h('button', {
+                  key: 'next',
+                  type: 'button',
+                  style: againButtonStyle,
+                  onClick: () => commit(sokobanNext(stateRef.current), true),
+                }, '下一关'),
+              ])
+            : null,
+        ])),
+        h('div', {
+          key: 'hint',
+          style: { marginTop: 2, fontSize: 9, textAlign: 'center', color: 'var(--dsw-alias-label-secondary)' },
+        }, focused ? '方向键 / WASD 推箱 · R 重置' : '点击卡片后方向键 / WASD 推箱'),
+      ]);
+    }
+
     // │ Card                                                         │
     // └──────────────────────────────────────────────────────────────┘
-    const GAME_IDS = ['2048', 'tetris', 'gomoku', 'klotski', 'snake', 'schulte', 'breakout'];
+    const GAME_IDS = ['2048', 'tetris', 'gomoku', 'klotski', 'snake', 'schulte', 'breakout', 'sokoban'];
     const GAME_LABELS = {
       '2048': '2048',
       tetris: 'Tetris',
@@ -2708,6 +3060,7 @@ window.__ModuleLoader__.load({
       snake: '贪吃蛇',
       schulte: '舒尔特',
       breakout: '打砖块',
+      sokoban: '推箱子',
     };
 
     function loadSaved() {
@@ -2727,6 +3080,7 @@ window.__ModuleLoader__.load({
               snake: saved.snake || null,
               schulte: saved.schulte || null,
               breakout: saved.breakout || null,
+              sokoban: saved.sokoban || null,
               reset,
             };
           }
@@ -2743,7 +3097,8 @@ window.__ModuleLoader__.load({
         snake: null,
         schulte: null,
         breakout: null,
-        reset: { '2048': 0, tetris: 0, gomoku: 0, klotski: 0, snake: 0, schulte: 0, breakout: 0 },
+        sokoban: null,
+        reset: { '2048': 0, tetris: 0, gomoku: 0, klotski: 0, snake: 0, schulte: 0, breakout: 0, sokoban: 0 },
       };
     }
 
@@ -2778,8 +3133,10 @@ window.__ModuleLoader__.load({
             next.snake = { ...freshSnakeState(), best: prev.snake ? prev.snake.best : 0 };
           } else if (active === 'schulte') {
             next.schulte = freshSchulteState(prev.schulte ? prev.schulte.best : 0, prev.schulte ? prev.schulte.mode : undefined);
-          } else {
+          } else if (active === 'breakout') {
             next.breakout = freshBreakoutState(prev.breakout ? prev.breakout.best : 0);
+          } else {
+            next.sokoban = freshSokobanState(prev.sokoban ? prev.sokoban.best : []);
           }
           return next;
         });
@@ -2853,6 +3210,7 @@ window.__ModuleLoader__.load({
           { id: 'snake', Comp: GameSnake, initial: saved.snake },
           { id: 'schulte', Comp: GameSchulte, initial: saved.schulte },
           { id: 'breakout', Comp: GameBreakout, initial: saved.breakout },
+          { id: 'sokoban', Comp: GameSokoban, initial: saved.sokoban },
         ].map((spec) => h('div', {
           key: `slot-${spec.id}`,
           style: {
@@ -2885,12 +3243,12 @@ window.__ModuleLoader__.load({
       }, [saved]);
 
       // Pop the card open once a long agent run is detected; the Host half
-      // watches `agent/status` and serves /api/dsh-games/status.
+      // watches `agent/status` and serves /api/dsh-casual-games/status.
       useEffect(() => {
         let disposed = false;
         const poll = async () => {
           try {
-            const response = await fetch('/api/dsh-games/status', { cache: 'no-store' });
+            const response = await fetch('/api/dsh-casual-games/status', { cache: 'no-store' });
             if (!response.ok) return;
             const data = await response.json();
             if (disposed || !data) return;
@@ -2941,7 +3299,7 @@ window.__ModuleLoader__.load({
       apply(ctx) {
         ctx.slots.inject('shell.overlay', () => ctx.slots.register({
           name: 'shell.overlay',
-          id: 'dsh-games',
+          id: 'dsh-casual-games',
           order: 60,
           label: '游戏',
         }, GameShell));
@@ -2984,6 +3342,13 @@ window.__ModuleLoader__.load({
         schulteSlot,
         freshBreakoutState,
         breakoutStep,
+        freshSokobanState,
+        sokobanParse,
+        sokobanMove,
+        sokobanSolved: sokobanIsSolved,
+        sokobanReset,
+        sokobanNext,
+        SOKOBAN_LEVELS,
       },
     };
   },

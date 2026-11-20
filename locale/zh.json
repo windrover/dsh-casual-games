@@ -16,8 +16,8 @@
   "tetris.pause": "暂停 (P)",
   "tetris.hint": "←→移动 ↑/X转向 ↓加速 Space硬落",
   "meta": {
-    "title": "侧栏小游戏",
-    "description": "在左侧栏底部常驻七款小游戏：2048、Tetris、五子棋、华容道、贪吃蛇、舒尔特方格与打砖块。",
+    "title": "侧栏休闲游戏",
+    "description": "在左侧栏底部常驻八款小游戏。",
     "detail": "docs/DETAIL.md"
   }
 }

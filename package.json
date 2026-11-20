@@ -1,15 +1,15 @@
 {
-  "name": "dsh-games",
+  "name": "dsh-casual-games",
   "version": "1.0.0",
-  "description": "Seven mini-games docked in the DeepSeek Harness sidebar: 2048, Tetris, Gomoku, Klotski, Snake, Schulte table and Breakout.",
+  "description": "Eight mini-games docked in the DeepSeek Harness sidebar: 2048, Tetris, Gomoku, Klotski, Snake, Schulte table, Breakout and Sokoban.",
   "type": "module",
   "license": "MIT",
   "author": "windrover",
   "repository": {
     "type": "git",
-    "url": "https://github.com/windrover/dsh-games.git"
+    "url": "https://github.com/windrover/dsh-casual-games.git"
   },
-  "homepage": "https://github.com/windrover/dsh-games",
+  "homepage": "https://github.com/windrover/dsh-casual-games",
   "keywords": [
     "deepseek-harness",
     "dsh",
@@ -20,7 +20,8 @@
     "gomoku",
     "klotski",
     "snake",
-    "breakout"
+    "breakout",
+    "sokoban"
   ],
   "engines": {
     "dsh": ">=0.2.0-0 <0.3.0-0"

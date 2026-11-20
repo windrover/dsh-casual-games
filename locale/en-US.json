@@ -16,8 +16,8 @@
   "tetris.pause": "Paused (P)",
   "tetris.hint": "←→ move, ↑/X rotate, ↓ soft drop, Space hard drop",
   "meta": {
-    "title": "Sidebar mini-games",
-    "description": "Seven tiny games docked at the bottom of the DeepSeek Harness sidebar: 2048, Tetris, Gomoku, Klotski, Snake, Schulte table and Breakout.",
+    "title": "Sidebar casual games",
+    "description": "Eight tiny games docked at the bottom of the DeepSeek Harness sidebar.",
     "detail": "docs/DETAIL.md"
   }
 }

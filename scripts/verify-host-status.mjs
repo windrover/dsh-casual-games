@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Host-half smoke: agent/status -> /api/dsh-games/status payload. */
+/** Host-half smoke: agent/status -> /api/dsh-casual-games/status payload. */
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 
@@ -29,7 +29,7 @@ const ctx = {
 apply(ctx);
 assert.equal(routes.length, 1);
 const route = routes[0];
-assert.equal(route.path, '/api/dsh-games/status');
+assert.equal(route.path, '/api/dsh-casual-games/status');
 
 function call(method) {
   const captured = { status: 0, body: '', headers: {} };

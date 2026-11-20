@@ -48,7 +48,7 @@ const plain = (value) => JSON.parse(JSON.stringify(value));
 const eq = (actual, expected, message) => assert.deepEqual(plain(actual), expected, message);
 
 assert.ok(caught, 'module loader was not invoked');
-assert.equal(caught.id, 'dsh-games');
+assert.equal(caught.id, 'dsh-casual-games');
 const plugin = caught.factory(sandbox.require);
 eq(plugin.inject, ['slots']);
 assert.equal(typeof plugin.apply, 'function');
@@ -61,6 +61,7 @@ const {
   freshSnakeState, snakeStep,
   freshSchulteState, schulteShuffle, schulteTap, schulteSlot,
   freshBreakoutState, breakoutStep,
+  freshSokobanState, sokobanParse, sokobanMove, sokobanSolved, SOKOBAN_LEVELS,
 } = plugin.__internals;
 
 // ┌──────────────────────────────────────────────────────────────┐
@@ -450,6 +451,67 @@ const bkCleared = breakoutStep({
 assert.equal(bkCleared.over, true);
 assert.equal(bkCleared.won, true);
 
-const counts = { '2048': 25, tetris: 23, gomoku: 16, klotski: 9, snake: 10, schulte: 16, breakout: 11 };
-const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout;
-console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout} (${total} total)`);
+// ┌──────────────────────────────────────────────────────────────┐
+// │ Sokoban                                                      │
+// └──────────────────────────────────────────────────────────────┘
+const sk = freshSokobanState([]);
+assert.equal(SOKOBAN_LEVELS.length, 4);
+assert.equal(sk.level, 0);
+assert.equal(sk.solved, false);
+
+const parsed0 = sokobanParse(0);
+assert.ok(parsed0.walls.length > 0);
+assert.equal(parsed0.boxes.length, 1);
+assert.equal(parsed0.targets.length, 1);
+
+// first level: push the single box up one target
+const solvedOne = sokobanMove(sk, -1, 0);
+assert.equal(solvedOne.player.r, 3);
+assert.equal(solvedOne.boxes[0].r, 2);
+assert.equal(solvedOne.solved, true);
+assert.equal(solvedOne.best[0], 1);
+
+// walls block movement
+const sokobanBlocked = sokobanMove({ ...sk, player: { r: 4, c: 1 } }, 0, -1);
+assert.equal(sokobanBlocked.player.c, 1);
+
+// every bundled level must be solvable (BFS over boxes+player)
+function sokobanSolvable(levelIndex) {
+  const parsed = sokobanParse(levelIndex);
+  const start = {
+    level: levelIndex,
+    player: { ...parsed.player },
+    boxes: parsed.boxes.map((box) => ({ ...box })),
+    moves: 0,
+    solved: false,
+    best: [],
+  };
+  const queue = [start];
+  const seen = new Set();
+  const keyOf = (state) =>
+    `${state.player.r},${state.player.c}:${state.boxes.map((box) => `${box.r}.${box.c}`).join('|')}`;
+  seen.add(keyOf(start));
+  const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+  while (queue.length) {
+    const current = queue.shift();
+    if (sokobanSolved(current)) return true;
+    for (const [dr, dc] of dirs) {
+      const next = sokobanMove(current, dr, dc);
+      if (next === current) continue;
+      const key = keyOf(next);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (seen.size > 200000) return false;
+      queue.push(next);
+    }
+  }
+  return false;
+}
+
+for (let level = 0; level < SOKOBAN_LEVELS.length; level += 1) {
+  assert.equal(sokobanSolvable(level), true, `sokoban level ${level + 1} is solvable`);
+}
+
+const counts = { '2048': 25, tetris: 23, gomoku: 16, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 12 };
+const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban;
+console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban} (${total} total)`);

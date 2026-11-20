@@ -1,6 +1,6 @@
-# dsh-games
+# dsh-casual-games
 
-Seven tiny games docked at the bottom-left of the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) sidebar. One compact card, one dropdown, no window juggling.
+Eight tiny games docked at the bottom-left of the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) sidebar. One compact card, one dropdown, no window juggling.
 
 ## Games
 
@@ -12,6 +12,7 @@ Seven tiny games docked at the bottom-left of the [DeepSeek Harness](https://git
 | **Klotski** | Select a block, then click a target cell or use arrow keys. Put Cao Cao on the bottom-centre exit to win. |
 | **Snake** | Arrow keys / `WASD`, `P` pause, `Space` restart. |
 | **Schulte table** | Tap 1→25 in order. Progress / time / best are shown; the remaining numbers reshuffle every 4 s. The board can be a square grid or a rotating circle (numbers stay upright). |
+| **Sokoban** | Arrow keys / `WASD` walk and push, `R` resets the level. Push every crate onto a target; four bundled levels advance automatically. |
 | **Breakout** | Drag the paddle with the mouse/touch (pointer capture keeps it following outside the field), or hold `←` `→` / `A` `D`. `Space` serves, `P` pauses. Six staggered rows of bricks. |
 
 ## Install
@@ -20,14 +21,14 @@ Inside a DSH profile directory:
 
 ```bash
 cd ~/.dsh/profiles/<your-profile>
-pnpm add github:windrover/dsh-games
+pnpm add github:windrover/dsh-casual-games
 ```
 
-Then add `dsh-games` to `dsh.profile.bundles` in that profile's `package.json` (or install it through DSH's plugin manager), and **fully restart DSH** — the desktop client caches plugin client modules.
+Then add `dsh-casual-games` to `dsh.profile.bundles` in that profile's `package.json` (or install it through DSH's plugin manager), and **fully restart DSH** — the desktop client caches plugin client modules.
 
 ## Automatic pop-up during long agent runs
 
-The Host half listens to `agent/status` and serves `GET /api/dsh-games/status` with `{ running, longestMs, longRunning }`. When any agent has been running for more than 3.5 s, the client expands the card once; it resets after the run finishes, and a manual minimize is respected.
+The Host half listens to `agent/status` and serves `GET /api/dsh-casual-games/status` with `{ running, longestMs, longRunning }`. When any agent has been running for more than 3.5 s, the client expands the card once; it resets after the run finishes, and a manual minimize is respected.
 
 ## Architecture
 
@@ -41,7 +42,7 @@ The Host half listens to `agent/status` and serves `GET /api/dsh-games/status` w
 ```bash
 npm test
 # or individually
-node scripts/verify-games-logic.mjs   # 110 pure-logic assertions across all games
+node scripts/verify-games-logic.mjs   # 122 pure-logic assertions across all games (incl. Sokoban BFS solvability)
 node scripts/smoke-render.mjs         # renders components with a minimal hook runtime
 node scripts/verify-host-status.mjs   # host route: running / longRunning / idle / 405
 ```

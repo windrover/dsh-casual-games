@@ -22,15 +22,15 @@ export function apply(ctx) {
     } else {
       runningSince.delete(payload.agent);
     }
-  }), 'dsh-games: agent status');
+  }), 'dsh-casual-games: agent status');
 
   ctx.effect(() => ctx.on('agent/disposed', (payload) => {
     if (payload && payload.agent) runningSince.delete(payload.agent);
-  }), 'dsh-games: agent disposed');
+  }), 'dsh-casual-games: agent disposed');
 
   ctx.effect(() => webServer.register({
     kind: 'exact',
-    path: '/api/dsh-games/status',
+    path: '/api/dsh-casual-games/status',
     handler: (req, res) => {
       if (req.method !== 'GET') {
         sendJson(res, 405, { ok: false, error: 'method not allowed' });
@@ -49,5 +49,5 @@ export function apply(ctx) {
         longRunning: runningSince.size > 0 && longestMs >= LONG_RUNNING_MS,
       });
     },
-  }), 'dsh-games: status route');
+  }), 'dsh-casual-games: status route');
 }
