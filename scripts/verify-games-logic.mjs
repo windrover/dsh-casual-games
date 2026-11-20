@@ -284,6 +284,19 @@ assert.ok(hardWin && hardWin.row === 5 && (hardWin.col === 1 || hardWin.col === 
 assert.equal(freshGomokuState().level, 'normal');
 assert.equal(gomokuWouldWin(fourBoard, 7, 1, 1), true);
 
+// easy never plays next to your stones (it is a pure beginner)
+const easyBoard = freshGomokuState().board.map((line) => line.slice());
+easyBoard[7][7] = 1;
+easyBoard[7][8] = 1;
+for (let attempt = 0; attempt < 5; attempt += 1) {
+  const easyMove = gomokuAiMove(easyBoard, 2, 1, 'easy');
+  assert.ok(easyMove, 'easy returns a move');
+  assert.ok(
+    Math.abs(easyMove.row - 7) > 1 || Math.abs(easyMove.col - 7) > 1,
+    'easy avoids the area around human stones',
+  );
+}
+
 // ┌──────────────────────────────────────────────────────────────┐
 // │ Klotski                                                      │
 // └──────────────────────────────────────────────────────────────┘
@@ -539,6 +552,6 @@ function sokobanSolvable(levelIndex) {
 
 assert.equal(sokobanSolvable(simplest), true, `simplest level ${simplest + 1} is solvable`);
 
-const counts = { '2048': 25, tetris: 23, gomoku: 16, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8 };
+const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8 };
 const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban;
 console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban} (${total} total)`);

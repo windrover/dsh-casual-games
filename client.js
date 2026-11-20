@@ -1252,18 +1252,26 @@ window.__ModuleLoader__.load({
       if (!empties.length) return null;
       const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
-      // hard and normal always take an immediate win, then block the human's win
-      if (difficulty !== 'easy') {
-        for (const cell of empties) if (gomokuWouldWin(board, cell.row, cell.col, aiPlayer)) return cell;
-        for (const cell of empties) if (gomokuWouldWin(board, cell.row, cell.col, humanPlayer)) return cell;
-      } else if (Math.random() < 0.15) {
-        for (const cell of empties) if (gomokuWouldWin(board, cell.row, cell.col, humanPlayer)) return cell;
+      // Easy is a pure beginner: random empty cell, deliberately avoiding the
+      // area around your stones so it never blocks or builds threats on purpose.
+      if (difficulty === 'easy') {
+        const humanStones = [];
+        for (let row = 0; row < GOMOKU_N; row += 1) {
+          for (let col = 0; col < GOMOKU_N; col += 1) {
+            if (board[row][col] === humanPlayer) humanStones.push({ row, col });
+          }
+        }
+        const calm = empties.filter((cell) => !humanStones.some((stone) =>
+          Math.abs(stone.row - cell.row) <= 1 && Math.abs(stone.col - cell.col) <= 1));
+        return pick(calm.length ? calm : empties);
       }
-      // easy mostly wanders: weak scoring plus a lot of noise, and no win-taking
-      if (difficulty === 'easy' && Math.random() < 0.8) return pick(empties);
 
-      const attackWeight = difficulty === 'hard' ? 1.5 : difficulty === 'easy' ? 0.4 : 1.15;
-      const defendWeight = difficulty === 'hard' ? 1.1 : difficulty === 'easy' ? 0.35 : 1;
+      // Normal / hard: always take a win, then block yours.
+      for (const cell of empties) if (gomokuWouldWin(board, cell.row, cell.col, aiPlayer)) return cell;
+      for (const cell of empties) if (gomokuWouldWin(board, cell.row, cell.col, humanPlayer)) return cell;
+
+      const attackWeight = difficulty === 'hard' ? 1.5 : 1.15;
+      const defendWeight = difficulty === 'hard' ? 1.1 : 1;
       let best = -Infinity;
       let bestMoves = [];
       for (const cell of empties) {
@@ -1271,7 +1279,6 @@ window.__ModuleLoader__.load({
         const defend = gomokuPointScore(board, cell.row, cell.col, humanPlayer);
         let score = attack * attackWeight + defend * defendWeight;
         score += (7 - Math.abs(cell.row - 7)) + (7 - Math.abs(cell.col - 7));
-        if (difficulty === 'easy') score += Math.random() * 1200;
         if (difficulty === 'hard') {
           // prefer moves that create two open threats
           board[cell.row][cell.col] = aiPlayer;

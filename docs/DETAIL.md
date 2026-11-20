@@ -8,7 +8,7 @@
 |---|---|
 | 2048 | 4×4，方向键移动，合并动画与分数/最高分常显 |
 | Tetris | 10×20，点击开始；分数/消行/等级在左侧栏纵向排列，下一块完整预览 |
-| 五子棋 | 围棋式 15×15 交叉点；人机对战，难度 简单/普通/困难；黑子带高光 |
+| 五子棋 | 围棋式 15×15 交叉点；人机对战，难度 简单/普通/困难（简单为纯随机、刻意避开你的棋子附近，不堵不杀）；黑子带高光 |
 | 华容道 | 经典「横刀立马」；先选块，再点目标格或方向键；曹操移到底部中间通关 |
 | 贪吃蛇 | 15×15，方向键/WASD，P 暂停，空格重开；分数/最高常显 |
 | 舒尔特方格 | 按 1→25 点击，计时/最佳/进度常显；剩余数字每 4 秒重洗；可切换方形 / 圆形旋转棋盘（数字始终正立） |
@@ -61,7 +61,7 @@ Host 半订阅 `agent/status` 与 `agent/disposed`，记录每个 agent 的连�
 
 ```bash
 npm test
-node scripts/verify-games-logic.mjs   # 118 条纯逻辑断言（含推箱子 100 关完整性 + BFS 解一关）
+node scripts/verify-games-logic.mjs   # 119 条纯逻辑断言（含推箱子 100 关完整性 + BFS 解一关）
 node scripts/smoke-render.mjs         # 极简 hook runtime 渲染冒烟
 node scripts/verify-host-status.mjs   # Host 状态路由
 ```

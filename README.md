@@ -8,7 +8,7 @@ Eight tiny games docked at the bottom-left of the [DeepSeek Harness](https://git
 |---|---|
 | **2048** | Arrow keys. Score / best are always visible; slide, merge and spawn are animated. |
 | **Tetris** | Click the board to start. `←` `→` move, `↑` / `X` rotate, `↓` soft drop, `Space` hard drop, `P` pause. Leaving the tab pauses the run. |
-| **Gomoku** | Go-style 15×15 intersection board. You play black against the computer; difficulty `Simple / Normal / Hard` (simple is nearly random and never takes a win on purpose). |
+| **Gomoku** | Go-style 15×15 intersection board. You play black against the computer; difficulty `Simple / Normal / Hard` (simple is a pure beginner: random empty cell, deliberately away from your stones, never blocks or takes a win on purpose). |
 | **Klotski** | Select a block, then click a target cell or use arrow keys. Put Cao Cao on the bottom-centre exit to win. |
 | **Snake** | Arrow keys / `WASD`, `P` pause, `Space` restart. |
 | **Schulte table** | Tap 1→25 in order. Progress / time / best are shown; the remaining numbers reshuffle every 4 s. The board can be a square grid or a rotating circle (numbers stay upright). |
@@ -42,7 +42,7 @@ The Host half listens to `agent/status` and serves `GET /api/dsh-casual-games/st
 ```bash
 npm test
 # or individually
-node scripts/verify-games-logic.mjs   # 118 pure-logic assertions across all games (incl. Sokoban pack validation + one BFS solve)
+node scripts/verify-games-logic.mjs   # 119 pure-logic assertions across all games (incl. Sokoban pack validation + one BFS solve)
 node scripts/smoke-render.mjs         # renders components with a minimal hook runtime
 node scripts/verify-host-status.mjs   # host route: running / longRunning / idle / 405
 ```
