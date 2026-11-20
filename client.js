@@ -4057,10 +4057,19 @@ window.__ModuleLoader__.load({
         commit(sokobanReset(stateRef.current), true);
       }, [commit]);
 
+      const nextLevel = useCallback(() => {
+        commit(sokobanNext(stateRef.current), true);
+      }, [commit]);
+
       useEffect(() => {
         if (!focused || !active) return undefined;
         const onKeyDown = (event) => {
           const key = event.key;
+          if ((key === 'Enter' || key === 'NumpadEnter') && stateRef.current.solved) {
+            event.preventDefault();
+            nextLevel();
+            return;
+          }
           if (key === 'ArrowLeft' || key === 'a' || key === 'A') { event.preventDefault(); move(0, -1); return; }
           if (key === 'ArrowRight' || key === 'd' || key === 'D') { event.preventDefault(); move(0, 1); return; }
           if (key === 'ArrowUp' || key === 'w' || key === 'W') { event.preventDefault(); move(-1, 0); return; }
@@ -4069,7 +4078,7 @@ window.__ModuleLoader__.load({
         };
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-      }, [focused, active, move, restart]);
+      }, [focused, active, move, restart, nextLevel]);
 
       const onTouchStart = useCallback((event) => {
         const point = event.touches[0];
@@ -4198,13 +4207,14 @@ window.__ModuleLoader__.load({
           state.solved
             ? h('div', { key: 'done', style: overlayStyle('rgba(12, 18, 26, 0.86)', '#ffffff') }, [
                 h('div', { key: 'title', style: { marginBottom: 4 } }, '过关！'),
-                h('div', { key: 'moves', style: { fontSize: 10, marginBottom: 8, fontWeight: 500 } },
+                h('div', { key: 'moves', style: { fontSize: 10, marginBottom: 2, fontWeight: 500 } },
                   `${state.moves} 步 · 最佳 ${state.best[state.level]} 步`),
+                h('div', { key: 'enter', style: { fontSize: 10, marginBottom: 8 } }, '按 Enter 进入下一关'),
                 h('button', {
                   key: 'next',
                   type: 'button',
                   style: againButtonStyle,
-                  onClick: () => commit(sokobanNext(stateRef.current), true),
+                  onClick: nextLevel,
                 }, '下一关'),
               ])
             : null,
@@ -4212,7 +4222,9 @@ window.__ModuleLoader__.load({
         h('div', {
           key: 'hint',
           style: { marginTop: 2, fontSize: 9, textAlign: 'center', color: 'var(--dsw-alias-label-secondary)' },
-        }, focused ? '方向键 / WASD 推箱 · R 重置' : '点击卡片后方向键 / WASD 推箱'),
+        }, state.solved
+          ? '按 Enter 进入下一关 · R 重玩本关'
+          : (focused ? '方向键 / WASD 推箱 · R 重置' : '点击卡片后方向键 / WASD 推箱')),
       ]);
     }
 
