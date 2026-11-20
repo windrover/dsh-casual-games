@@ -1,0 +1,59 @@
+{
+  "name": "dsh-games",
+  "version": "1.0.0",
+  "description": "Seven mini-games docked in the DeepSeek Harness sidebar: 2048, Tetris, Gomoku, Klotski, Snake, Schulte table and Breakout.",
+  "type": "module",
+  "license": "MIT",
+  "author": "windrover",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/windrover/dsh-games.git"
+  },
+  "homepage": "https://github.com/windrover/dsh-games",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "games",
+    "2048",
+    "tetris",
+    "gomoku",
+    "klotski",
+    "snake",
+    "breakout"
+  ],
+  "engines": {
+    "dsh": ">=0.2.0-0 <0.3.0-0"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale",
+    "docs",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node scripts/verify-games-logic.mjs && node scripts/smoke-render.mjs && node scripts/verify-host-status.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

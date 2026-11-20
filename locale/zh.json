@@ -1,0 +1,23 @@
+{
+  "plugin.name": "2048 / 俄罗斯方块 左下角游戏",
+  "plugin.description": "在 DSH 左下角常驻一个可切换的双游戏卡片（2048 和 俄罗斯方块）",
+  "game.title": "2048",
+  "game.tetris": "Tetris",
+  "game.score": "分数",
+  "game.best": "最高",
+  "game.restart": "重新开始",
+  "game.collapse": "最小化",
+  "game.expand": "展开游戏",
+  "game.over": "游戏结束",
+  "game.again": "再来一局",
+  "game.hint": "点击卡片后方向键操控",
+  "game.hintActive": "方向键操控",
+  "tetris.next": "下一块",
+  "tetris.pause": "暂停 (P)",
+  "tetris.hint": "←→移动 ↑/X转向 ↓加速 Space硬落",
+  "meta": {
+    "title": "侧栏小游戏",
+    "description": "在左侧栏底部常驻七款小游戏：2048、Tetris、五子棋、华容道、贪吃蛇、舒尔特方格与打砖块。",
+    "detail": "docs/DETAIL.md"
+  }
+}

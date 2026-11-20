@@ -1,0 +1,23 @@
+{
+  "plugin.name": "2048 / Tetris Corner Game",
+  "plugin.description": "A switchable two-game card persistently docked in the bottom-left corner of DSH (2048 and Tetris)",
+  "game.title": "2048",
+  "game.tetris": "Tetris",
+  "game.score": "Score",
+  "game.best": "Best",
+  "game.restart": "New game",
+  "game.collapse": "Minimize",
+  "game.expand": "展开游戏",
+  "game.over": "Game over",
+  "game.again": "Try again",
+  "game.hint": "点击卡片后方向键操控",
+  "game.hintActive": "Arrow keys",
+  "tetris.next": "Next piece",
+  "tetris.pause": "Paused (P)",
+  "tetris.hint": "←→ move, ↑/X rotate, ↓ soft drop, Space hard drop",
+  "meta": {
+    "title": "Sidebar mini-games",
+    "description": "Seven tiny games docked at the bottom of the DeepSeek Harness sidebar: 2048, Tetris, Gomoku, Klotski, Snake, Schulte table and Breakout.",
+    "detail": "docs/DETAIL.md"
+  }
+}
