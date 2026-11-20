@@ -18,6 +18,7 @@ window.__ModuleLoader__.load({
     // └──────────────────────────────────────────────────────────────┘
     const CARD_WIDTH = 240;
     const GAME_BODY_H = 275;
+    const SIDEBAR_HIDDEN_CSS = '[data-sidebar-collapsed] .dshcg-root { display: none !important; }';
     const STORE_KEY = 'dsh.games.v2';
 
     const cardStyle = {
@@ -4331,6 +4332,7 @@ window.__ModuleLoader__.load({
       const title = GAME_LABELS[active];
 
       return h('div', {
+        className: 'dshcg-root',
         style: cardStyle,
         tabIndex: 0,
         role: 'application',
@@ -4345,6 +4347,7 @@ window.__ModuleLoader__.load({
           event.currentTarget.focus();
         },
       }, [
+        h('style', { key: 'sidebar-css' }, SIDEBAR_HIDDEN_CSS),
         h('div', { key: 'head', style: headStyle }, [
           h('div', { key: 'picker', style: { display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 } }, [
             h('span', {
@@ -4460,6 +4463,7 @@ window.__ModuleLoader__.load({
 
       if (collapsed) {
         return h('button', {
+          className: 'dshcg-root',
           type: 'button',
           style: pillStyle,
           title: '展开游戏',
@@ -4468,7 +4472,10 @@ window.__ModuleLoader__.load({
             setCollapsed(false);
             setFocused(false);
           },
-        }, '2048');
+        }, [
+          h('style', { key: 'sidebar-css' }, SIDEBAR_HIDDEN_CSS),
+          '2048',
+        ]);
       }
 
       return h(GameCard, {

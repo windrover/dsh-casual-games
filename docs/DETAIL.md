@@ -52,6 +52,7 @@ Host 半订阅 `agent/status` 与 `agent/disposed`，记录每个 agent 的连�
 
 ## 布局与状态
 
+- 侧边栏折叠时（`[data-sidebar-collapsed]`）卡片与折叠胶囊通过 CSS 隐藏
 - 卡片 `position: fixed; left: 12px; bottom: 72px; width: 240px`，仅 1px 主题描边，无滚动条
 - 七款游戏同时挂载，叠放在同一个 CSS Grid 单元里，卡片高度恒为 275px 游戏区，切换不跳动
 - `GameShell` 是唯一状态源，持久化到 `localStorage['dsh.games.v2']`；各游戏挂载时自行 `sanitize`
