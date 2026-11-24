@@ -62,6 +62,9 @@ const {
   freshSchulteState, schulteShuffle, schulteTap, schulteSlot,
   freshBreakoutState, breakoutStep,
   freshSokobanState, sokobanParse, sokobanMove, sokobanSolved, SOKOBAN_LEVELS,
+  SUDOKU_PUZZLES, SUDOKU_DIFFICULTIES, SUDOKU_PER_LEVEL, sudokuFresh, sudokuIsSolved,
+  sudokuPlace, sudokuErase, sudokuToggleNotesMode, sudokuSelect, sudokuNextPuzzle,
+  sudokuSetDifficulty, sanitizeSudoku,
 } = plugin.__internals;
 
 // ┌──────────────────────────────────────────────────────────────┐
@@ -552,6 +555,87 @@ function sokobanSolvable(levelIndex) {
 
 assert.equal(sokobanSolvable(simplest), true, `simplest level ${simplest + 1} is solvable`);
 
-const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8 };
-const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban;
-console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban} (${total} total)`);
+// ┌──────────────────────────────────────────────────────────────┐
+// │ Sudoku                                                       │
+// └──────────────────────────────────────────────────────────────┘
+function sudokuSolutionValid(solution) {
+  for (let row = 0; row < 9; row += 1) {
+    const seen = new Set();
+    for (let col = 0; col < 9; col += 1) seen.add(solution[row * 9 + col]);
+    if (seen.size !== 9) return false;
+  }
+  for (let col = 0; col < 9; col += 1) {
+    const seen = new Set();
+    for (let row = 0; row < 9; row += 1) seen.add(solution[row * 9 + col]);
+    if (seen.size !== 9) return false;
+  }
+  for (let box = 0; box < 9; box += 1) {
+    const seen = new Set();
+    for (let at = 0; at < 9; at += 1) {
+      const row = Math.floor(box / 3) * 3 + Math.floor(at / 3);
+      const col = (box % 3) * 3 + (at % 3);
+      seen.add(solution[row * 9 + col]);
+    }
+    if (seen.size !== 9) return false;
+  }
+  return true;
+}
+
+for (const difficulty of ['easy', 'medium', 'hard']) {
+  assert.equal(SUDOKU_PUZZLES[difficulty].length, SUDOKU_PER_LEVEL, `${difficulty} has 20 puzzles`);
+  for (const entry of SUDOKU_PUZZLES[difficulty]) {
+    assert.equal(entry.puzzle.length, 81, 'puzzle is 81 chars');
+    assert.equal(entry.solution.length, 81, 'solution is 81 chars');
+    assert.ok(sudokuSolutionValid(entry.solution), 'solution is a valid sudoku');
+    for (let i = 0; i < 81; i += 1) {
+      if (entry.puzzle[i] !== '0') assert.equal(entry.puzzle[i], entry.solution[i], 'givens match solution');
+    }
+  }
+}
+
+let sudoku = sudokuFresh('easy', 0);
+assert.equal(sudoku.grid.length, 81);
+assert.equal(sudoku.solved, false);
+const sudokuEmpty = [...sudoku.puzzle].findIndex((char) => char === '0');
+assert.ok(sudokuEmpty >= 0, 'puzzle has an empty cell');
+
+sudoku = sudokuSelect(sudoku, sudokuEmpty);
+sudoku = sudokuPlace(sudoku, Number(sudoku.solution[sudokuEmpty]));
+assert.equal(sudoku.grid[sudokuEmpty], Number(sudoku.solution[sudokuEmpty]), 'digit placed');
+
+sudoku = sudokuSelect(sudoku, sudokuEmpty);
+sudoku = sudokuErase(sudoku);
+assert.equal(sudoku.grid[sudokuEmpty], 0, 'eraser clears the cell');
+
+sudoku = sudokuToggleNotesMode(sudoku);
+sudoku = sudokuPlace(sudoku, 7);
+assert.deepEqual([...sudoku.notes[sudokuEmpty]], [7], 'pencil adds a candidate');
+sudoku = sudokuPlace(sudoku, 7);
+assert.deepEqual([...sudoku.notes[sudokuEmpty]], [], 'pencil toggles a candidate off');
+sudoku = sudokuToggleNotesMode(sudoku);
+
+sudoku = sudokuPlace(sudoku, 7);
+assert.equal(sudoku.solved, false, 'a single wrong cell is not solved');
+sudoku = sudokuSelect(sudoku, sudokuEmpty);
+sudoku = sudokuErase(sudoku);
+
+let sudokuFull = sudokuFresh('medium', 0);
+for (let i = 0; i < 81; i += 1) {
+  if (sudokuFull.grid[i] !== 0) continue;
+  sudokuFull = sudokuSelect(sudokuFull, i);
+  sudokuFull = sudokuPlace(sudokuFull, Number(sudokuFull.solution[i]));
+}
+assert.equal(sudokuFull.solved, true, 'filling the solution wins');
+assert.equal(sudokuIsSolved(sudokuFull.grid, sudokuFull.solution), true);
+
+const sudokuLast = sudokuFresh('hard', 19);
+assert.equal(sudokuNextPuzzle(sudokuLast).index, 0, 'next puzzle wraps to the first');
+assert.equal(sudokuSetDifficulty(sudokuLast, 'easy').difficulty, 'easy');
+assert.equal(sudokuSetDifficulty(sudokuLast, 'easy').index, 0);
+
+const sudokuDirty = sanitizeSudoku({ ...sudokuFull, grid: sudokuFull.grid.slice(0, 80) });
+assert.equal(sudokuDirty.grid.length, 81, 'sanitizer rebuilds an invalid grid');
+
+const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 12 };
+const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban + counts.sudoku;
+console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban}, sudoku=${counts.sudoku} (${total} total)`);

@@ -111,7 +111,7 @@ assert.ok(text.includes('2048'), 'shell shows 2048 toggle');
 assert.ok(text.includes('分数'), 'shell shows score chip');
 assert.ok(text.includes('最高'), 'shell shows best chip');
 assert.ok(text.includes('Tetris'), 'shell shows tetris toggle');
-for (const label of ['五子棋', '华容道', '贪吃蛇', '舒尔特', '打砖块', '推箱子']) {
+for (const label of ['五子棋', '华容道', '贪吃蛇', '舒尔特', '打砖块', '推箱子', '数独']) {
   assert.ok(text.includes(label), `shell shows ${label} toggle`);
 }
 
@@ -189,6 +189,9 @@ for (const label of ['分数', '最高']) assert.ok(snakeText.includes(label), `
 
 const sokobanText = cardText('sokoban');
 for (const label of ['关卡', '步数', '最佳']) assert.ok(sokobanText.includes(label), `sokoban shows ${label}`);
+
+const sudokuText = cardText('sudoku');
+for (const label of ['难度', '铅笔', '橡皮', '1/20']) assert.ok(sudokuText.includes(label), `sudoku shows ${label}`);
 
 const breakoutText = cardText('breakout');
 for (const label of ['分数', '生命', '最高', '点击发球', '控制挡板']) assert.ok(breakoutText.includes(label), `breakout shows ${label}`);

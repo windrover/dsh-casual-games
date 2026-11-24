@@ -1,6 +1,6 @@
 # dsh-casual-games
 
-Eight tiny games docked at the bottom-left of the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) sidebar. One compact card, one dropdown, no window juggling.
+Nine tiny games docked at the bottom-left of the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) sidebar. One compact card, one dropdown, no window juggling.
 
 ## Games
 
@@ -12,6 +12,7 @@ Eight tiny games docked at the bottom-left of the [DeepSeek Harness](https://git
 | **Klotski** | Select a block, then click a target cell or use arrow keys. Put Cao Cao on the bottom-centre exit to win. |
 | **Snake** | Arrow keys / `WASD`, `P` pause, `Space` restart. |
 | **Schulte table** | Tap 1→25 in order. Progress / time / best are shown; the remaining numbers reshuffle every 4 s. The board can be a square grid or a rotating circle (numbers stay upright). |
+| **Sudoku** | 9×9 grid, three difficulties with 20 puzzles each (60 total). Select a cell, tap 1–9, toggle `✎ Pencil` for candidate marks and `⌫ Eraser` to clear; arrow keys move the selection, `N` toggles pencil. Each puzzle has a unique solution. |
 | **Sokoban** | Classic 100-level Sokoban pack (16×16 XSB-style maps). Arrow keys / `WASD` walk and push, `R` resets the level; press `Enter` after clearing a level to advance (the overlay button still works). |
 | **Breakout** | Drag the paddle with the mouse/touch (pointer capture keeps it following outside the field), or hold `←` `→` / `A` `D`. `Space` serves, `P` pauses. Six staggered rows of bricks. |
 
@@ -50,10 +51,14 @@ Games watch `keydown` on `window` while the card is focused, but every handler r
 ```bash
 npm test
 # or individually
-node scripts/verify-games-logic.mjs   # 119 pure-logic assertions across all games (incl. Sokoban pack validation + one BFS solve)
+node scripts/verify-games-logic.mjs   # 131 pure-logic assertions across all games (incl. 60 Sudoku puzzles and a solved board)
 node scripts/smoke-render.mjs         # renders components with a minimal hook runtime
 node scripts/verify-host-status.mjs   # host route: running / longRunning / idle / 405
 ```
+
+## Credits
+
+Sudoku puzzles come from the public-domain [Sudoku Exchange puzzle bank](https://github.com/grantm/sudoku-exchange-puzzle-bank) (generated with QQWing, graded with Sukaku Explainer). The first 20 of each bucket are bundled; every solution was re-verified when the data was imported.
 
 ## License
 

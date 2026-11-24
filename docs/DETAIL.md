@@ -1,6 +1,6 @@
 # dsh-casual-games — 侧栏小游戏
 
-在 DeepSeek Harness 左侧栏底部常驻一张小游戏卡片，内置八款游戏，通过顶部「游戏：」下拉框切换。卡片固定在左下角空白区，不占用对话区域，刷新后自动出现。
+在 DeepSeek Harness 左侧栏底部常驻一张小游戏卡片，内置九款游戏，通过顶部「游戏：」下拉框切换。卡片固定在左下角空白区，不占用对话区域，刷新后自动出现。
 
 ## 游戏
 
@@ -12,6 +12,7 @@
 | 华容道 | 经典「横刀立马」；先选块，再点目标格或方向键；曹操移到底部中间通关 |
 | 贪吃蛇 | 15×15，方向键/WASD，P 暂停，空格重开；分数/最高常显 |
 | 舒尔特方格 | 按 1→25 点击，计时/最佳/进度常显；剩余数字每 4 秒重洗；可切换方形 / 圆形旋转棋盘（数字始终正立） |
+| 数独 | 9×9；简单/普通/困难各 20 题；点格子后点 1–9，✎ 铅笔填候选、⌫ 橡皮清除；方向键移动，N 切换铅笔；题目来自 Sudoku Exchange 公共题库，均有唯一解 |
 | 推箱子 | 经典 100 关 Sokoban 关卡包；方向键/WASD 移动推箱，R 重置；过关后按 Enter 进入下一关（也可点按钮） |
 | 打砖块 | 6 行 39 块错位砖；鼠标/触屏拖动或 ←→/A D 控制挡板，空格发球，P 暂停 |
 
@@ -64,7 +65,7 @@ Host 半订阅 `agent/status` 与 `agent/disposed`，记录每个 agent 的连�
 
 ```bash
 npm test
-node scripts/verify-games-logic.mjs   # 119 条纯逻辑断言（含推箱子 100 关完整性 + BFS 解一关）
+node scripts/verify-games-logic.mjs   # 131 条纯逻辑断言（含推箱子 100 关完整性 + 数独 60 题校验）
 node scripts/smoke-render.mjs         # 极简 hook runtime 渲染冒烟
 node scripts/verify-host-status.mjs   # Host 状态路由
 ```

@@ -4398,9 +4398,501 @@ window.__ModuleLoader__.load({
       ]);
     }
 
+
+    // ┌──────────────────────────────────────────────────────────────┐
+    // │ Sudoku (数独)                                                │
+    // └──────────────────────────────────────────────────────────────┘
+    // 60 puzzles from the public-domain Sudoku Exchange puzzle bank
+    // (https://github.com/grantm/sudoku-exchange-puzzle-bank), graded with
+    // Sukaku Explainer; first 20 of each bucket, each with a unique solution.
+    const SUDOKU_PUZZLES = {
+      easy: [
+        { puzzle: '050703060007000800000816000000030000005000100730040086906000204840572093000409000', solution: '158723469367954821294816375619238547485697132732145986976381254841572693523469718' },
+        { puzzle: '302401809001000300000000000040708010780502036000090000200609003900000008800070005', solution: '372451869691827354458936271543768912789512436126394587215689743937145628864273195' },
+        { puzzle: '000823001003000400070000052300960010000102000010038006830000040002000900600789000', solution: '594823671263517489178694352327965814486172593915438726839256147752341968641789235' },
+        { puzzle: '500700032100326000000000000020070058010803040890040070000000000000654001230009005', solution: '569718432148326597372495816423971658715863249896542173651237984987654321234189765' },
+        { puzzle: '760000053020080040005000900000000000040010070603000104100304009000000000006827300', solution: '764192853329785641815436927271649538948513276653278194182354769537961482496827315' },
+        { puzzle: '140000050700200000000300204200080400080090020006050001809001000000006007050000069', solution: '142768953735249618698315274213687495584193726976452831869571342421936587357824169' },
+        { puzzle: '002009000015008760040000051620407000000010000000206074170000090098500610000700800', solution: '762159438915348762843672951621437589487915326539286174174863295398524617256791843' },
+        { puzzle: '060010030830605029000000000006030900092000570000409000285000716000000000470000095', solution: '567912438834675129921843657146537982392186574758429361285394716619758243473261895' },
+        { puzzle: '600002305000970016021000009070643000000000000000891040200000530310064000904700001', solution: '698412375453978216721356489172643958849527163536891742267189534315264897984735621' },
+        { puzzle: '007020850200516000400000006070648090930102068060953020700000005000495002029060100', solution: '617324859298516347453789216172648593935172468864953721746231985381495672529867134' },
+        { puzzle: '003700040200954800094103702039000486060000020452000390607408950005297004040005200', solution: '813726549276954831594183762139572486768349125452861397627418953385297614941635278' },
+        { puzzle: '014600380980201074200000009050108093000050000890302010300000005570403061068009230', solution: '714695382985231674236784159652178493143956728897342516321867945579423861468519237' },
+        { puzzle: '400029006000700000002014900708901020903050807020806109001690500000003000300180002', solution: '487529316139768254652314978768931425913452867524876139241697583875243691396185742' },
+        { puzzle: '008004003050097040400501002300000000047000260000000007500709004090350020700200800', solution: '918624573253897146476531982365172498147983265829465317582719634694358721731246859' },
+        { puzzle: '000050000700000001005904800204030107003491500000705000001000700500306008320000069', solution: '986152374742863951135974826254638197673491582819725643461289735597346218328517469' },
+        { puzzle: '000803000060000020005000100006459800002000700050302010830000075000106000040000080', solution: '214863597763591428985247163176459832392618754458372916831924675527186349649735281' },
+        { puzzle: '060500400803004070005100000100060009000000000400020007000007600070600105009001080', solution: '962578431813294576745136928127463859538719264496825317281957643374682195659341782' },
+        { puzzle: '236000591010050070008000400849000237000000000000428000097000140000306000580070026', solution: '236847591914652378758913462849561237162739854375428619697285143421396785583174926' },
+        { puzzle: '640008703050420018708600400800000160090030070071000009005001906480096030109300087', solution: '642918753953427618718653492834279165296135874571864329325781946487596231169342587' },
+        { puzzle: '020805090040090010000060000300000004008000500002901800001403200703050908000000000', solution: '627815493845397612139264785396528174418736529572941836951483267763152948284679351' },
+      ],
+      medium: [
+        { puzzle: '020900000048000031000063020009407003003080200400105600030570000250000180000006050', solution: '325941768648752931971863524569427813713689245482135679136578492257394186894216357' },
+        { puzzle: '100800570000009210090040000300900050007000300020006008000020040071400000064007003', solution: '143862579658739214792541836316978452987254361425316798839625147271493685564187923' },
+        { puzzle: '002000800005020100460000029130060052009080400000302000006070200700000008020519070', solution: '312947865985623147467851329138764952279185436654392781596478213741236598823519674' },
+        { puzzle: '802600009000058000006000401090406005020000040600203090205000900000970000100002804', solution: '812634579947158263536729481791486325328597146654213798265841937483975612179362854' },
+        { puzzle: '070000120100000067000200004200040070710030049090070001300009000950000006067000080', solution: '579486123142395867683217594235941678716538249894672351328769415951824736467153982' },
+        { puzzle: '054608003700004000800000020690000102000010000203000047070000006000500008900306410', solution: '154628793762934851839157624695743182487215369213869547571482936346591278928376415' },
+        { puzzle: '000159000015000790000000000100405008280000067500728001000896000098010420000000000', solution: '347159682815642793962387154179465238284931567536728941421896375798513426653274819' },
+        { puzzle: '000000000340000091701060408800000006010000020600205009060107050005020100030090060', solution: '298341675346758291751962438823479516519836724674215389462187953985623147137594862' },
+        { puzzle: '206008309001002000700004012942060000000407000000080423620700004000200500309800206', solution: '256178349431692758798354612942563187183427965567981423625719834874236591319845276' },
+        { puzzle: '100009570798040000600002000012000008000000000500000320000300005000070416061200003', solution: '123689574798543162654712839912437658386125947547896321479361285235978416861254793' },
+        { puzzle: '009610720001050004000000010000400109000185000507002000080000000700090200045027300', solution: '439618725671259834258734916826473159394185672517962483182346597763591248945827361' },
+        { puzzle: '002806100000090000300000007003000200600704008820000045000010000140080063030050080', solution: '592876134784391526361245897413568279659724318827139645978613452145982763236457981' },
+        { puzzle: '010609070020701050050000090200000005000040000604805302060000080009010600000502000', solution: '413659278926781453857423196298136745135247869674895312362974581549318627781562934' },
+        { puzzle: '070090050500010006004000800001904300003000600960000085000000000006807100040000030', solution: '678493251539218746214576893851964372423785619967132485182349567396857124745621938' },
+        { puzzle: '038000006290010000540800100000100000020060040000004000004006051000090073300000290', solution: '138547926297613485546829137459172368721368549683954712974236851812495673365781294' },
+        { puzzle: '004060900860000014003000700000000000950642071600080002000000000025000680480010059', solution: '274165938869723514513894726742931865958642371631587492396258147125479683487316259' },
+        { puzzle: '450000027000050000006040800014709560090000080005020700100203008023000190000090000', solution: '451368927382957641976142835814739562297516384635824719169273458723485196548691273' },
+        { puzzle: '060070080107000503050104090001000800600305009034206710000020000000907000000601000', solution: '269573184147892563853164297521749836678315429934286715796428351312957648485631972' },
+        { puzzle: '030000000002379004004008100000080097006000500520010000008700400100834700000000080', solution: '837451269612379854954268173341582697786943512529617348268795431195834726473126985' },
+        { puzzle: '800000905039080620720004080002090000070406030000030100090800062048070510607000004', solution: '816723945439581627725964381382197456971456238564238179193845762248679513657312894' },
+      ],
+      hard: [
+        { puzzle: '080200400570000100002300000820090005000715000700020041000006700003000018007009050', solution: '389251467576948132142367589821694375934715826765823941258136794493572618617489253' },
+        { puzzle: '600050007030000000080409200015300000008000300000007590009501030000000080200070004', solution: '692853147134726859587419263915382476478695321326147598849561732761234985253978614' },
+        { puzzle: '210950004090060037000700000000000308920000015805000000000002000680010040100047096', solution: '217953864598264137346781952761495328924378615835126479479632581682519743153847296' },
+        { puzzle: '024000650100000007008010900000000000260090083080501070600903008002854700000070000', solution: '924738651156249837738615942597382164261497583483561279675923418312854796849176325' },
+        { puzzle: '000050000000206000064000390045000810000020000000107000053000980090804060100030004', solution: '921453678378296145564781392245369817617528439839147256453672981792814563186935724' },
+        { puzzle: '108500406000070900530004007001060008090408070800050600700100069006080000904006205', solution: '178593426462871953539624187341267598695418372827359641753142869216985734984736215' },
+        { puzzle: '970306042805000109000050000207000304010020080400738001000905000000000000100847003', solution: '971386542865472139324159876287591364513624987496738251732965418648213795159847623' },
+        { puzzle: '040000000086100034001500260000305840000040000058902000095008300160009450000000010', solution: '547236981286197534931584267619375842372841695458962173795418326163729458824653719' },
+        { puzzle: '045900000000710205020003009008301026010000050360805100200100030801057000000009510', solution: '645982371983716245127543689598371426712694853364825197259168734831457962476239518' },
+        { puzzle: '900801005000607000870000069490000057080000020000375000040000070008060900109000603', solution: '964821735235697481871534269493286157587149326612375894346912578758463912129758643' },
+        { puzzle: '000006007007050000054090100090304080003060700010907050006080410000070900900100000', solution: '129836547867451239354792168795314682243568791618927354576289413481673925932145876' },
+        { puzzle: '000000000003702800060354090089000160070645030000000000040000070200506004000010000', solution: '924168753513792846867354291489237165172645938356981427641823579298576314735419682' },
+        { puzzle: '060050030000306000007000400030000060014020790700000001000000000900147005051609870', solution: '168754239542396187397812456839471562614523798725968341476285913983147625251639874' },
+        { puzzle: '103600400590001008000200000809020000207080905000070204000002000600800039005003802', solution: '183695427592741368476238591859124673247386915361579284938412756624857139715963842' },
+        { puzzle: '500000001020600700780005000904001008000908000200500904000300017009006050600000002', solution: '596782341421693785783415269964231578357948126218567934842359617179826453635174892' },
+        { puzzle: '300005007010030590020008000708000000090000010000000902000900040032080070400600001', solution: '364195827817432596925768134758219463293846715641357982576921348132584679489673251' },
+        { puzzle: '600040001030008700009700000003096000906000103000120500000002400002400080400010002', solution: '687245931231968745549731268123596874956874123874123596765382419312459687498617352' },
+        { puzzle: '200010007000207000050000020005020400001549200300708001070804030000000000630000085', solution: '293615847416287359857493126965321478781549263342768591179854632528936714634172985' },
+        { puzzle: '200040003600239008000000000029000530850000016006102900070805060900703001000010000', solution: '287541693615239748493678125129486537854397216736152984371825469942763851568914372' },
+        { puzzle: '869000312020000080070108040030000090700060004001902500000836000400070003000010000', solution: '869457312124693785573128946235741698798365124641982537952836471416279853387514269' },
+      ],
+    };
+
+    const SUDOKU_DIFFICULTIES = { easy: '简单', medium: '普通', hard: '困难' };
+    const SUDOKU_TILE = 22;
+    const SUDOKU_PER_LEVEL = 20;
+
+    function sudokuPuzzle(difficulty, index) {
+      const list = SUDOKU_PUZZLES[difficulty] || SUDOKU_PUZZLES.easy;
+      const at = Math.max(0, Math.min(list.length - 1, Number(index) || 0));
+      return list[at];
+    }
+
+    function sudokuFresh(difficulty, index) {
+      const diff = SUDOKU_DIFFICULTIES[difficulty] ? difficulty : 'easy';
+      const at = Math.max(0, Math.min(SUDOKU_PER_LEVEL - 1, Number(index) || 0));
+      const puzzle = sudokuPuzzle(diff, at);
+      return {
+        difficulty: diff,
+        index: at,
+        puzzle: puzzle.puzzle,
+        solution: puzzle.solution,
+        grid: [...puzzle.puzzle].map((ch) => Number(ch) || 0),
+        notes: Array.from({ length: 81 }, () => []),
+        selected: null,
+        notesMode: false,
+        moves: 0,
+        solved: false,
+      };
+    }
+
+    function sudokuIsSolved(grid, solution) {
+      for (let i = 0; i < 81; i += 1) {
+        if (!grid[i] || grid[i] !== Number(solution[i])) return false;
+      }
+      return true;
+    }
+
+    function sanitizeSudoku(state) {
+      const base = sudokuFresh(state && state.difficulty, state && state.index);
+      if (!state || state.puzzle !== base.puzzle || !Array.isArray(state.grid) || state.grid.length !== 81) {
+        return base;
+      }
+      const given = base.puzzle;
+      base.grid = state.grid.map((value, i) => {
+        if (given[i] !== '0') return Number(given[i]);
+        const digit = Number(value);
+        return Number.isInteger(digit) && digit >= 0 && digit <= 9 ? digit : 0;
+      });
+      base.notes = Array.from({ length: 81 }, (_, i) => {
+        const raw = state.notes && state.notes[i];
+        if (!Array.isArray(raw)) return [];
+        const digits = raw.map(Number).filter((digit) => Number.isInteger(digit) && digit >= 1 && digit <= 9);
+        return digits.filter((digit, at) => digits.indexOf(digit) === at).sort((a, b) => a - b);
+      });
+      base.moves = Number(state.moves) || 0;
+      base.solved = sudokuIsSolved(base.grid, base.solution);
+      return base;
+    }
+
+    function sudokuPeer(a, b) {
+      const ar = Math.floor(a / 9);
+      const ac = a % 9;
+      const br = Math.floor(b / 9);
+      const bc = b % 9;
+      if (ar === br || ac === bc) return true;
+      return Math.floor(ar / 3) === Math.floor(br / 3) && Math.floor(ac / 3) === Math.floor(bc / 3);
+    }
+
+    function sudokuSelect(state, index) {
+      if (!Number.isInteger(index) || index < 0 || index > 80) return state;
+      if (state.selected === index) return state;
+      return { ...state, selected: index };
+    }
+
+    function sudokuToggleNotesMode(state) {
+      return { ...state, notesMode: !state.notesMode };
+    }
+
+    function sudokuPlace(state, digit) {
+      if (!state || state.solved || state.selected === null) return state;
+      if (state.puzzle[state.selected] !== '0') return state;
+      if (!Number.isInteger(digit) || digit < 1 || digit > 9) return state;
+      const index = state.selected;
+      const grid = state.grid.slice();
+      const notes = state.notes.map((list) => list.slice());
+      if (state.notesMode) {
+        if (grid[index] !== 0) return state;
+        const list = notes[index];
+        const at = list.indexOf(digit);
+        notes[index] = at >= 0 ? list.filter((value) => value !== digit) : [...list, digit].sort((a, b) => a - b);
+        return { ...state, notes, moves: state.moves + 1 };
+      }
+      grid[index] = digit;
+      notes[index] = [];
+      if (String(digit) === state.solution[index]) {
+        for (let i = 0; i < 81; i += 1) {
+          if (i !== index && sudokuPeer(index, i)) {
+            notes[i] = notes[i].filter((value) => value !== digit);
+          }
+        }
+      }
+      return {
+        ...state,
+        grid,
+        notes,
+        moves: state.moves + 1,
+        solved: sudokuIsSolved(grid, state.solution),
+      };
+    }
+
+    function sudokuErase(state) {
+      if (!state || state.solved || state.selected === null) return state;
+      if (state.puzzle[state.selected] !== '0') return state;
+      const grid = state.grid.slice();
+      const notes = state.notes.map((list) => list.slice());
+      grid[state.selected] = 0;
+      notes[state.selected] = [];
+      return { ...state, grid, notes, moves: state.moves + 1 };
+    }
+
+    function sudokuNextPuzzle(state) {
+      return sudokuFresh(state.difficulty, (state.index + 1) % SUDOKU_PER_LEVEL);
+    }
+
+    function sudokuSetDifficulty(state, difficulty) {
+      if (!SUDOKU_DIFFICULTIES[difficulty]) return state;
+      return sudokuFresh(difficulty, 0);
+    }
+
+    const sudokuBoardStyle = {
+      position: 'relative',
+      display: 'grid',
+      padding: 2,
+      boxSizing: 'border-box',
+      background: '#0f1622',
+      border: '1px solid #0a0f16',
+      borderRadius: 6,
+      boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5)',
+      touchAction: 'none',
+    };
+
+    function sudokuToolStyle(highlight) {
+      return {
+        height: 20,
+        minWidth: 24,
+        padding: '0 4px',
+        borderRadius: 4,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: highlight ? 'var(--dsw-alias-brand-primary)' : 'var(--dsw-alias-bg-layer-2)',
+        color: highlight ? '#ffffff' : 'var(--dsw-alias-label-primary)',
+        fontSize: 10,
+        lineHeight: '18px',
+        cursor: 'pointer',
+      };
+    }
+
+    function GameSudoku({ initial, onChange, focused, active = true }) {
+      const [state, setState] = useState(() => sanitizeSudoku(initial));
+      const stateRef = useRef(state);
+      const onChangeRef = useRef(onChange);
+
+      useEffect(() => {
+        onChangeRef.current = onChange;
+      }, [onChange]);
+
+      useEffect(() => {
+        stateRef.current = state;
+      }, [state]);
+
+      const commit = useCallback((next, notify) => {
+        if (next === stateRef.current) return;
+        stateRef.current = next;
+        setState(next);
+        if (notify && onChangeRef.current) onChangeRef.current(next);
+      }, []);
+
+      const select = useCallback((index) => {
+        commit(sudokuSelect(stateRef.current, index), true);
+      }, [commit]);
+
+      const place = useCallback((digit) => {
+        commit(sudokuPlace(stateRef.current, digit), true);
+      }, [commit]);
+
+      const erase = useCallback(() => {
+        commit(sudokuErase(stateRef.current), true);
+      }, [commit]);
+
+      const toggleNotes = useCallback(() => {
+        commit(sudokuToggleNotesMode(stateRef.current), true);
+      }, [commit]);
+
+      const nextPuzzle = useCallback(() => {
+        commit(sudokuNextPuzzle(stateRef.current), true);
+      }, [commit]);
+
+      const changeDifficulty = useCallback((difficulty) => {
+        commit(sudokuSetDifficulty(stateRef.current, difficulty), true);
+      }, [commit]);
+
+      const selectByOffset = useCallback((dr, dc) => {
+        const current = stateRef.current.selected;
+        const start = current === null ? 0 : current;
+        const row = Math.max(0, Math.min(8, Math.floor(start / 9) + dr));
+        const col = Math.max(0, Math.min(8, (start % 9) + dc));
+        select(row * 9 + col);
+      }, [select]);
+
+      useEffect(() => {
+        if (!focused || !active) return undefined;
+        const onKeyDown = (event) => {
+          if (isTypingTarget(event.target)) return;
+          const key = event.key;
+          if ((key === 'Enter' || key === 'NumpadEnter') && stateRef.current.solved) {
+            event.preventDefault();
+            nextPuzzle();
+            return;
+          }
+          if (key >= '1' && key <= '9') {
+            event.preventDefault();
+            place(Number(key));
+            return;
+          }
+          if (key === 'Backspace' || key === 'Delete') {
+            event.preventDefault();
+            erase();
+            return;
+          }
+          if (key === 'n' || key === 'N') {
+            event.preventDefault();
+            toggleNotes();
+            return;
+          }
+          if (key === 'ArrowLeft') { event.preventDefault(); selectByOffset(0, -1); return; }
+          if (key === 'ArrowRight') { event.preventDefault(); selectByOffset(0, 1); return; }
+          if (key === 'ArrowUp') { event.preventDefault(); selectByOffset(-1, 0); return; }
+          if (key === 'ArrowDown') { event.preventDefault(); selectByOffset(1, 0); return; }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+      }, [focused, active, place, erase, toggleNotes, nextPuzzle, selectByOffset]);
+
+      const selected = state.selected;
+      const selectedGiven = selected !== null && state.puzzle[selected] !== '0';
+      const canPlay = !state.solved && selected !== null && !selectedGiven;
+
+      const cells = [];
+      for (let i = 0; i < 81; i += 1) {
+        const row = Math.floor(i / 9);
+        const col = i % 9;
+        const given = state.puzzle[i] !== '0';
+        const value = state.grid[i];
+        const wrong = value !== 0 && value !== Number(state.solution[i]);
+        const isSelected = selected === i;
+        const cellNotes = state.notes[i] || [];
+        cells.push(h('div', {
+          key: i,
+          onClick: () => select(i),
+          style: {
+            position: 'relative',
+            width: SUDOKU_TILE,
+            height: SUDOKU_TILE,
+            boxSizing: 'border-box',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderTop: row === 0 ? 'none' : (row % 3 === 0 ? '1px solid #5a6c88' : '1px solid #26313f'),
+            borderLeft: col === 0 ? 'none' : (col % 3 === 0 ? '1px solid #5a6c88' : '1px solid #26313f'),
+            background: isSelected ? '#24476f' : (wrong ? 'rgba(255, 90, 90, 0.16)' : 'transparent'),
+            color: wrong
+              ? '#ff7b7b'
+              : given
+                ? 'var(--dsw-alias-label-primary)'
+                : '#6cc0ff',
+            fontWeight: given ? 700 : 600,
+            fontSize: 13,
+            lineHeight: 1,
+            userSelect: 'none',
+          },
+        }, value
+          ? String(value)
+          : (cellNotes.length
+            ? h('div', {
+                key: 'notes',
+                style: {
+                  position: 'absolute',
+                  left: 1,
+                  right: 1,
+                  top: 1,
+                  bottom: 1,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gridTemplateRows: 'repeat(3, 1fr)',
+                  fontSize: 5.5,
+                  lineHeight: '6px',
+                  color: 'var(--dsw-alias-label-secondary)',
+                },
+              }, Array.from({ length: 9 }, (_, noteIndex) => h('span', {
+                key: noteIndex,
+                style: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+              }, cellNotes.includes(noteIndex + 1) ? String(noteIndex + 1) : '')))
+            : null)));
+      }
+
+      return h('div', {
+        style: { display: 'flex', flexDirection: 'column', height: '100%' },
+      }, [
+        h('div', {
+          key: 'toolbar',
+          style: { display: 'flex', alignItems: 'center', gap: 4, height: 22, flexShrink: 0 },
+        }, [
+          h('span', {
+            key: 'label',
+            style: { fontSize: 9, color: 'var(--dsw-alias-label-secondary)', whiteSpace: 'nowrap' },
+          }, '难度'),
+          h('select', {
+            key: 'difficulty',
+            value: state.difficulty,
+            onChange: (event) => changeDifficulty(event.target.value),
+            style: {
+              font: 'inherit',
+              fontSize: 10,
+              padding: '0 2px',
+              height: 20,
+              borderRadius: 4,
+              border: '1px solid var(--dsw-alias-border-l1)',
+              background: 'var(--dsw-alias-bg-layer-2)',
+              color: 'var(--dsw-alias-label-primary)',
+            },
+          }, Object.keys(SUDOKU_DIFFICULTIES).map((key) => h('option', {
+            key,
+            value: key,
+          }, SUDOKU_DIFFICULTIES[key]))),
+          h('button', {
+            key: 'pencil',
+            type: 'button',
+            title: '铅笔：填写候选数',
+            'aria-label': '铅笔',
+            onClick: toggleNotes,
+            style: sudokuToolStyle(state.notesMode),
+          }, '✎ 铅笔'),
+          h('button', {
+            key: 'eraser',
+            type: 'button',
+            title: '橡皮：清除当前格',
+            'aria-label': '橡皮',
+            onClick: erase,
+            style: sudokuToolStyle(false),
+          }, '⌫ 橡皮'),
+          h('span', { key: 'spacer', style: { flex: 1 } }),
+          h('span', {
+            key: 'progress',
+            style: { fontSize: 10, color: 'var(--dsw-alias-label-secondary)', whiteSpace: 'nowrap' },
+          }, `${state.index + 1}/${SUDOKU_PER_LEVEL}`),
+        ]),
+        h('div', {
+          key: 'boardWrap',
+          style: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0 },
+        }, h('div', {
+          key: 'board',
+          style: {
+            ...sudokuBoardStyle,
+            gridTemplateColumns: `repeat(9, ${SUDOKU_TILE}px)`,
+            gridTemplateRows: `repeat(9, ${SUDOKU_TILE}px)`,
+          },
+        }, [
+          ...cells,
+          state.solved
+            ? h('div', {
+                key: 'done',
+                style: overlayStyle('rgba(12, 18, 26, 0.86)', '#ffffff'),
+              }, [
+                h('div', { key: 'title', style: { marginBottom: 4 } }, '完成！'),
+                h('div', { key: 'moves', style: { fontSize: 10, marginBottom: 2, fontWeight: 500 } },
+                  `${state.moves} 步 · ${SUDOKU_DIFFICULTIES[state.difficulty]}`),
+                h('div', { key: 'enter', style: { fontSize: 10, marginBottom: 8 } }, '按 Enter 进入下一题'),
+                h('button', {
+                  key: 'next',
+                  type: 'button',
+                  style: againButtonStyle,
+                  onClick: nextPuzzle,
+                }, '下一题'),
+              ])
+            : null,
+        ])),
+        h('div', {
+          key: 'pad',
+          style: { display: 'flex', gap: 2, marginTop: 2, flexShrink: 0 },
+        }, Array.from({ length: 9 }, (_, index) => h('button', {
+          key: index,
+          type: 'button',
+          disabled: !canPlay,
+          onClick: () => place(index + 1),
+          style: {
+            flex: 1,
+            height: 22,
+            padding: 0,
+            borderRadius: 4,
+            border: '1px solid var(--dsw-alias-border-l1)',
+            background: 'var(--dsw-alias-bg-layer-2)',
+            color: 'var(--dsw-alias-label-primary)',
+            fontSize: 11,
+            fontWeight: 600,
+            cursor: canPlay ? 'pointer' : 'default',
+            opacity: canPlay ? 1 : 0.45,
+          },
+        }, String(index + 1)))),
+        h('div', {
+          key: 'hint',
+          style: { marginTop: 2, fontSize: 9, textAlign: 'center', color: 'var(--dsw-alias-label-secondary)' },
+        }, state.solved
+          ? '按 Enter 下一题 · R 重开本题'
+          : (focused ? '点格子后选数字 · ✎ 填候选 · 方向键移动' : '点击卡片后开始数独')),
+      ]);
+    }
+
+    // ┌──────────────────────────────────────────────────────────────┐
     // │ Card                                                         │
     // └──────────────────────────────────────────────────────────────┘
-    const GAME_IDS = ['2048', 'tetris', 'gomoku', 'klotski', 'snake', 'schulte', 'breakout', 'sokoban'];
+    const GAME_IDS = ['2048', 'tetris', 'gomoku', 'klotski', 'snake', 'schulte', 'breakout', 'sokoban', 'sudoku'];
     const GAME_LABELS = {
       '2048': '2048',
       tetris: 'Tetris',
@@ -4410,6 +4902,7 @@ window.__ModuleLoader__.load({
       schulte: '舒尔特',
       breakout: '打砖块',
       sokoban: '推箱子',
+      sudoku: '数独',
     };
 
     function loadSaved() {
@@ -4430,6 +4923,7 @@ window.__ModuleLoader__.load({
               schulte: saved.schulte || null,
               breakout: saved.breakout || null,
               sokoban: saved.sokoban || null,
+              sudoku: saved.sudoku || null,
               reset,
             };
           }
@@ -4447,7 +4941,8 @@ window.__ModuleLoader__.load({
         schulte: null,
         breakout: null,
         sokoban: null,
-        reset: { '2048': 0, tetris: 0, gomoku: 0, klotski: 0, snake: 0, schulte: 0, breakout: 0, sokoban: 0 },
+        sudoku: null,
+        reset: { '2048': 0, tetris: 0, gomoku: 0, klotski: 0, snake: 0, schulte: 0, breakout: 0, sokoban: 0, sudoku: 0 },
       };
     }
 
@@ -4484,8 +4979,10 @@ window.__ModuleLoader__.load({
             next.schulte = freshSchulteState(prev.schulte ? prev.schulte.best : 0, prev.schulte ? prev.schulte.mode : undefined);
           } else if (active === 'breakout') {
             next.breakout = freshBreakoutState(prev.breakout ? prev.breakout.best : 0);
-          } else {
+          } else if (active === 'sokoban') {
             next.sokoban = freshSokobanState(prev.sokoban ? prev.sokoban.best : []);
+          } else {
+            next.sudoku = sudokuFresh(prev.sudoku ? prev.sudoku.difficulty : 'easy', prev.sudoku ? prev.sudoku.index : 0);
           }
           return next;
         });
@@ -4562,6 +5059,7 @@ window.__ModuleLoader__.load({
           { id: 'schulte', Comp: GameSchulte, initial: saved.schulte },
           { id: 'breakout', Comp: GameBreakout, initial: saved.breakout },
           { id: 'sokoban', Comp: GameSokoban, initial: saved.sokoban },
+          { id: 'sudoku', Comp: GameSudoku, initial: saved.sudoku },
         ].map((spec) => h('div', {
           key: `slot-${spec.id}`,
           style: {
@@ -4704,6 +5202,18 @@ window.__ModuleLoader__.load({
         sokobanReset,
         sokobanNext,
         SOKOBAN_LEVELS,
+        SUDOKU_PUZZLES,
+        SUDOKU_DIFFICULTIES,
+        SUDOKU_PER_LEVEL,
+        sudokuFresh,
+        sudokuIsSolved,
+        sudokuPlace,
+        sudokuErase,
+        sudokuToggleNotesMode,
+        sudokuSelect,
+        sudokuNextPuzzle,
+        sudokuSetDifficulty,
+        sanitizeSudoku,
       },
     };
   },
