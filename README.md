@@ -12,7 +12,7 @@ Nine tiny games docked at the bottom-left of the [DeepSeek Harness](https://gith
 | **Klotski** | Select a block, then click a target cell or use arrow keys. Put Cao Cao on the bottom-centre exit to win. |
 | **Snake** | Arrow keys / `WASD`, `P` pause, `Space` restart. |
 | **Schulte table** | Tap 1→25 in order. Progress / time / best are shown; the remaining numbers reshuffle every 4 s. The board can be a square grid or a rotating circle (numbers stay upright). |
-| **Sudoku** | 9×9 grid, three difficulties with 20 puzzles each (60 total). Select a cell, tap 1–9, toggle `✎ Pencil` for candidate marks and `⌫ Eraser` to clear; arrow keys move the selection, `N` toggles pencil. Each puzzle has a unique solution. |
+| **Sudoku** | 9×9 grid, three difficulties with 20 puzzles each (60 total). Select a cell, tap 1–9, toggle `✎ Pencil` for candidate marks and `⌫ Eraser` to clear; arrow keys move the selection, `N` toggles pencil. Each puzzle has a unique solution; a number button greys out once all nine of that digit are correctly placed. |
 | **Sokoban** | Classic 100-level Sokoban pack (16×16 XSB-style maps). Arrow keys / `WASD` walk and push, `R` resets the level; press `Enter` after clearing a level to advance (the overlay button still works). |
 | **Breakout** | Drag the paddle with the mouse/touch (pointer capture keeps it following outside the field), or hold `←` `→` / `A` `D`. `Space` serves, `P` pauses. Six staggered rows of bricks. |
 

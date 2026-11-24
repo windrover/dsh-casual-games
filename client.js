@@ -4531,6 +4531,17 @@ window.__ModuleLoader__.load({
       return base;
     }
 
+    function sudokuCompletedDigits(state) {
+      const counts = new Array(10).fill(0);
+      for (let i = 0; i < 81; i += 1) {
+        const digit = state.grid[i];
+        if (digit >= 1 && digit <= 9 && digit === Number(state.solution[i])) {
+          counts[digit] += 1;
+        }
+      }
+      return counts;
+    }
+
     function sudokuPeer(a, b) {
       const ar = Math.floor(a / 9);
       const ac = a % 9;
@@ -4718,6 +4729,7 @@ window.__ModuleLoader__.load({
       const selected = state.selected;
       const selectedGiven = selected !== null && state.puzzle[selected] !== '0';
       const canPlay = !state.solved && selected !== null && !selectedGiven;
+      const digitCounts = sudokuCompletedDigits(state);
 
       const cells = [];
       for (let i = 0; i < 81; i += 1) {
@@ -4862,25 +4874,32 @@ window.__ModuleLoader__.load({
         h('div', {
           key: 'pad',
           style: { display: 'flex', gap: 2, marginTop: 2, flexShrink: 0 },
-        }, Array.from({ length: 9 }, (_, index) => h('button', {
-          key: index,
-          type: 'button',
-          disabled: !canPlay,
-          onClick: () => place(index + 1),
-          style: {
-            flex: 1,
-            height: 22,
-            padding: 0,
-            borderRadius: 4,
-            border: '1px solid var(--dsw-alias-border-l1)',
-            background: 'var(--dsw-alias-bg-layer-2)',
-            color: 'var(--dsw-alias-label-primary)',
-            fontSize: 11,
-            fontWeight: 600,
-            cursor: canPlay ? 'pointer' : 'default',
-            opacity: canPlay ? 1 : 0.45,
-          },
-        }, String(index + 1)))),
+        }, Array.from({ length: 9 }, (_, index) => {
+          const digit = index + 1;
+          const finished = digitCounts[digit] >= 9;
+          const enabled = canPlay && !finished;
+          return h('button', {
+            key: index,
+            type: 'button',
+            disabled: !enabled,
+            title: finished ? `${digit} 已全部填完` : `填入 ${digit}`,
+            onClick: () => place(digit),
+            style: {
+              flex: 1,
+              height: 22,
+              padding: 0,
+              borderRadius: 4,
+              border: '1px solid var(--dsw-alias-border-l1)',
+              background: 'var(--dsw-alias-bg-layer-2)',
+              color: finished ? 'var(--dsw-alias-label-secondary)' : 'var(--dsw-alias-label-primary)',
+              fontSize: 11,
+              fontWeight: 600,
+              cursor: enabled ? 'pointer' : 'default',
+              opacity: enabled ? 1 : 0.35,
+            },
+          }, String(digit));
+        })),
+
         h('div', {
           key: 'hint',
           style: { marginTop: 2, fontSize: 9, textAlign: 'center', color: 'var(--dsw-alias-label-secondary)' },
@@ -5214,6 +5233,7 @@ window.__ModuleLoader__.load({
         sudokuSelect,
         sudokuNextPuzzle,
         sudokuSetDifficulty,
+        sudokuCompletedDigits,
         sanitizeSudoku,
       },
     };
