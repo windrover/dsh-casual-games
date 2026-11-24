@@ -28,6 +28,8 @@ Then add `dsh-casual-games` to `dsh.profile.bundles` in that profile's `package.
 
 ## Automatic pop-up during long agent runs
 
+The status route enforces the Host connection gate (`ctx.connection.admit` / `requestRejection`) on every request, so a web page in the browser cannot read it without a DSH session.
+
 The card (and its collapsed pill) is hidden via CSS while the shell marks the sidebar collapsed (`[data-sidebar-collapsed]`).
 
 The Host half listens to `agent/status` and serves `GET /api/dsh-casual-games/status` with `{ running, longestMs, longRunning }`. When any agent has been running for more than 3.5 s, the client expands the card once; it resets after the run finishes, and a manual minimize is respected.

@@ -40,6 +40,8 @@ dsh-casual-games/
 
 ## 长任务自动弹出
 
+路由每次请求都会走 DSH 的连接鉴权（`ctx.connection.admit` / `requestRejection`），无 DSH 会话的请求返回 403。
+
 Host 半订阅 `agent/status` 与 `agent/disposed`，记录每个 agent 的连续运行时长，并通过 `GET /api/dsh-casual-games/status` 返回：
 
 ```json
