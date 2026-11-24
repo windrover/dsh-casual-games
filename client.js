@@ -84,7 +84,7 @@ window.__ModuleLoader__.load({
       display: 'flex',
       alignItems: 'center',
       gap: 4,
-      padding: '0 2px 8px',
+      padding: '0 16px 8px 2px',
     };
 
     const iconButtonStyle = {
@@ -5039,7 +5039,7 @@ window.__ModuleLoader__.load({
       const onResizeMove = (event) => {
         const drag = dragRef.current;
         if (!drag) return;
-        const next = clampCardScale(drag.scale + (event.clientX - drag.x + event.clientY - drag.y) / 320);
+        const next = clampCardScale(drag.scale + (event.clientX - drag.x - (event.clientY - drag.y)) / 320);
         setScale(next);
       };
 
@@ -5188,7 +5188,7 @@ window.__ModuleLoader__.load({
           style: {
             position: 'absolute',
             right: 2,
-            bottom: 2,
+            top: 2,
             width: 14,
             height: 14,
             cursor: 'nwse-resize',
@@ -5207,8 +5207,8 @@ window.__ModuleLoader__.load({
           viewBox: '0 0 12 12',
           style: { display: 'block' },
         }, [
-          h('line', { key: 'a', x1: 11, y1: 4, x2: 4, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
-          h('line', { key: 'b', x1: 11, y1: 8, x2: 8, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
+          h('line', { key: 'a', x1: 11, y1: 1, x2: 1, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
+          h('line', { key: 'b', x1: 11, y1: 5, x2: 5, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
         ])),
       ]);
     }
