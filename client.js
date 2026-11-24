@@ -4764,15 +4764,18 @@ window.__ModuleLoader__.load({
             borderTop: row === 0 ? 'none' : (row % 3 === 0 ? '1px solid #5a6c88' : '1px solid #26313f'),
             borderLeft: col === 0 ? 'none' : (col % 3 === 0 ? '1px solid #5a6c88' : '1px solid #26313f'),
             background: isSelected
-              ? '#24476f'
+              ? '#2c567f'
               : (wrong
                 ? 'rgba(255, 90, 90, 0.16)'
                 : (sameDigit
-                  ? 'rgba(108, 192, 255, 0.22)'
-                  : (noteMatch ? 'rgba(108, 192, 255, 0.08)' : 'transparent'))),
+                  ? '#1a2b3d'
+                  : (noteMatch ? 'rgba(108, 192, 255, 0.05)' : 'transparent'))),
+            boxShadow: isSelected ? 'inset 0 0 0 1px #7cc7ff' : 'none',
             color: wrong
               ? '#ff7b7b'
-              : (sameDigit ? '#bfe6ff' : (given ? '#e8eef7' : '#6cc0ff')),
+              : (isSelected
+                ? '#f2f8ff'
+                : (sameDigit ? '#9cc7e6' : (given ? '#e8eef7' : '#6cc0ff'))),
             fontWeight: given ? 700 : 600,
             fontSize: 13,
             lineHeight: 1,
