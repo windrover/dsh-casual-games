@@ -64,7 +64,7 @@ const {
   freshSokobanState, sokobanParse, sokobanMove, sokobanSolved, SOKOBAN_LEVELS,
   SUDOKU_PUZZLES, SUDOKU_DIFFICULTIES, SUDOKU_PER_LEVEL, sudokuFresh, sudokuIsSolved,
   sudokuPlace, sudokuErase, sudokuToggleNotesMode, sudokuSelect, sudokuNextPuzzle,
-  sudokuSetDifficulty, sudokuCompletedDigits, sanitizeSudoku,
+  sudokuSetDifficulty, sudokuCompletedDigits, sudokuHighlightDigit, sanitizeSudoku,
 } = plugin.__internals;
 
 // ┌──────────────────────────────────────────────────────────────┐
@@ -633,6 +633,12 @@ for (let digit = 1; digit <= 9; digit += 1) {
 }
 assert.ok(sudokuCompletedDigits(sudokuFresh('easy', 0)).slice(1).some((n) => n < 9), 'a fresh puzzle has unfinished digits');
 
+const sudokuGiven = [...sudoku.puzzle].findIndex((char) => char !== '0');
+assert.ok(sudokuGiven >= 0, 'puzzle has a given');
+const highlighted = sudokuSelect(sudoku, sudokuGiven);
+assert.equal(sudokuHighlightDigit(highlighted), Number(highlighted.solution[sudokuGiven]), 'selecting a given highlights its digit');
+assert.equal(sudokuHighlightDigit(sudokuSelect(sudoku, sudokuEmpty)), 0, 'an empty cell highlights nothing');
+
 const sudokuLast = sudokuFresh('hard', 19);
 assert.equal(sudokuNextPuzzle(sudokuLast).index, 0, 'next puzzle wraps to the first');
 assert.equal(sudokuSetDifficulty(sudokuLast, 'easy').difficulty, 'easy');
@@ -641,6 +647,6 @@ assert.equal(sudokuSetDifficulty(sudokuLast, 'easy').index, 0);
 const sudokuDirty = sanitizeSudoku({ ...sudokuFull, grid: sudokuFull.grid.slice(0, 80) });
 assert.equal(sudokuDirty.grid.length, 81, 'sanitizer rebuilds an invalid grid');
 
-const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 14 };
+const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 15 };
 const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban + counts.sudoku;
 console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban}, sudoku=${counts.sudoku} (${total} total)`);

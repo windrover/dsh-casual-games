@@ -4542,6 +4542,12 @@ window.__ModuleLoader__.load({
       return counts;
     }
 
+    function sudokuHighlightDigit(state) {
+      if (!state || state.selected === null) return 0;
+      const digit = state.grid[state.selected];
+      return digit >= 1 && digit <= 9 ? digit : 0;
+    }
+
     function sudokuPeer(a, b) {
       const ar = Math.floor(a / 9);
       const ac = a % 9;
@@ -4730,6 +4736,7 @@ window.__ModuleLoader__.load({
       const selectedGiven = selected !== null && state.puzzle[selected] !== '0';
       const canPlay = !state.solved && selected !== null && !selectedGiven;
       const digitCounts = sudokuCompletedDigits(state);
+      const highlightDigit = sudokuHighlightDigit(state);
 
       const cells = [];
       for (let i = 0; i < 81; i += 1) {
@@ -4740,6 +4747,8 @@ window.__ModuleLoader__.load({
         const wrong = value !== 0 && value !== Number(state.solution[i]);
         const isSelected = selected === i;
         const cellNotes = state.notes[i] || [];
+        const sameDigit = highlightDigit > 0 && value === highlightDigit;
+        const noteMatch = highlightDigit > 0 && value === 0 && cellNotes.includes(highlightDigit);
         cells.push(h('div', {
           key: i,
           onClick: () => select(i),
@@ -4754,12 +4763,16 @@ window.__ModuleLoader__.load({
             cursor: 'pointer',
             borderTop: row === 0 ? 'none' : (row % 3 === 0 ? '1px solid #5a6c88' : '1px solid #26313f'),
             borderLeft: col === 0 ? 'none' : (col % 3 === 0 ? '1px solid #5a6c88' : '1px solid #26313f'),
-            background: isSelected ? '#24476f' : (wrong ? 'rgba(255, 90, 90, 0.16)' : 'transparent'),
+            background: isSelected
+              ? '#24476f'
+              : (wrong
+                ? 'rgba(255, 90, 90, 0.16)'
+                : (sameDigit
+                  ? 'rgba(108, 192, 255, 0.22)'
+                  : (noteMatch ? 'rgba(108, 192, 255, 0.08)' : 'transparent'))),
             color: wrong
               ? '#ff7b7b'
-              : given
-                ? '#e8eef7'
-                : '#6cc0ff',
+              : (sameDigit ? '#bfe6ff' : (given ? '#e8eef7' : '#6cc0ff')),
             fontWeight: given ? 700 : 600,
             fontSize: 13,
             lineHeight: 1,
@@ -5234,6 +5247,7 @@ window.__ModuleLoader__.load({
         sudokuNextPuzzle,
         sudokuSetDifficulty,
         sudokuCompletedDigits,
+        sudokuHighlightDigit,
         sanitizeSudoku,
       },
     };
