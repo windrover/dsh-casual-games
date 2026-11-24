@@ -191,7 +191,7 @@ const sokobanText = cardText('sokoban');
 for (const label of ['关卡', '步数', '最佳']) assert.ok(sokobanText.includes(label), `sokoban shows ${label}`);
 
 const sudokuText = cardText('sudoku');
-for (const label of ['难度', '铅笔', '橡皮', '1/20']) assert.ok(sudokuText.includes(label), `sudoku shows ${label}`);
+for (const label of ['难度', '铅笔', '橡皮', '高亮', '1/20']) assert.ok(sudokuText.includes(label), `sudoku shows ${label}`);
 
 const breakoutText = cardText('breakout');
 for (const label of ['分数', '生命', '最高', '点击发球', '控制挡板']) assert.ok(breakoutText.includes(label), `breakout shows ${label}`);

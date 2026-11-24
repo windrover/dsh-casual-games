@@ -4497,6 +4497,7 @@ window.__ModuleLoader__.load({
         notes: Array.from({ length: 81 }, () => []),
         selected: null,
         notesMode: false,
+        highlight: true,
         moves: 0,
         solved: false,
       };
@@ -4527,6 +4528,7 @@ window.__ModuleLoader__.load({
         return digits.filter((digit, at) => digits.indexOf(digit) === at).sort((a, b) => a - b);
       });
       base.moves = Number(state.moves) || 0;
+      base.highlight = state.highlight !== false;
       base.solved = sudokuIsSolved(base.grid, base.solution);
       return base;
     }
@@ -4565,6 +4567,10 @@ window.__ModuleLoader__.load({
 
     function sudokuToggleNotesMode(state) {
       return { ...state, notesMode: !state.notesMode };
+    }
+
+    function sudokuToggleHighlight(state) {
+      return { ...state, highlight: state.highlight === false };
     }
 
     function sudokuPlace(state, digit) {
@@ -4682,6 +4688,10 @@ window.__ModuleLoader__.load({
         commit(sudokuToggleNotesMode(stateRef.current), true);
       }, [commit]);
 
+      const toggleHighlight = useCallback(() => {
+        commit(sudokuToggleHighlight(stateRef.current), true);
+      }, [commit]);
+
       const nextPuzzle = useCallback(() => {
         commit(sudokuNextPuzzle(stateRef.current), true);
       }, [commit]);
@@ -4736,7 +4746,7 @@ window.__ModuleLoader__.load({
       const selectedGiven = selected !== null && state.puzzle[selected] !== '0';
       const canPlay = !state.solved && selected !== null && !selectedGiven;
       const digitCounts = sudokuCompletedDigits(state);
-      const highlightDigit = sudokuHighlightDigit(state);
+      const highlightDigit = state.highlight === false ? 0 : sudokuHighlightDigit(state);
 
       const cells = [];
       for (let i = 0; i < 81; i += 1) {
@@ -4841,16 +4851,24 @@ window.__ModuleLoader__.load({
             title: '铅笔：填写候选数',
             'aria-label': '铅笔',
             onClick: toggleNotes,
-            style: sudokuToolStyle(state.notesMode),
-          }, '✎ 铅笔'),
+            style: { ...sudokuToolStyle(state.notesMode), fontSize: 9, padding: '0 3px' },
+          }, '铅笔'),
           h('button', {
             key: 'eraser',
             type: 'button',
             title: '橡皮：清除当前格',
             'aria-label': '橡皮',
             onClick: erase,
-            style: sudokuToolStyle(false),
-          }, '⌫ 橡皮'),
+            style: { ...sudokuToolStyle(false), fontSize: 9, padding: '0 3px' },
+          }, '橡皮'),
+          h('button', {
+            key: 'highlight',
+            type: 'button',
+            title: '高亮：选中数字时点亮全盘相同数字',
+            'aria-label': '高亮',
+            onClick: toggleHighlight,
+            style: { ...sudokuToolStyle(state.highlight !== false), fontSize: 9, padding: '0 3px' },
+          }, '高亮'),
           h('span', { key: 'spacer', style: { flex: 1 } }),
           h('span', {
             key: 'progress',
@@ -4921,7 +4939,7 @@ window.__ModuleLoader__.load({
           style: { marginTop: 2, fontSize: 9, textAlign: 'center', color: 'var(--dsw-alias-label-secondary)' },
         }, state.solved
           ? '按 Enter 下一题 · R 重开本题'
-          : (focused ? '点格子后选数字 · ✎ 填候选 · 方向键移动' : '点击卡片后开始数独')),
+          : (focused ? '点格子后选数字 · 铅笔填候选 · 高亮开关可关' : '点击卡片后开始数独')),
       ]);
     }
 
@@ -5251,6 +5269,7 @@ window.__ModuleLoader__.load({
         sudokuSetDifficulty,
         sudokuCompletedDigits,
         sudokuHighlightDigit,
+        sudokuToggleHighlight,
         sanitizeSudoku,
       },
     };
