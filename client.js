@@ -4036,13 +4036,20 @@ window.__ModuleLoader__.load({
       return { ...sokobanBoard(level), best: state.best ? state.best.slice() : SOKOBAN_LEVELS.map(() => null) };
     }
 
+    const SOKOBAN_BOARD_BG = '#121821';
+    const SOKOBAN_FLOOR = 'linear-gradient(180deg, #2b3343 0%, #232a37 100%)';
+    const SOKOBAN_WALL = 'linear-gradient(180deg, #5c6779 0%, #485264 55%, #3a4353 100%)';
+
     const sokobanBoardStyle = {
       position: 'relative',
       flexShrink: 0,
       display: 'grid',
-      background: '#1b2026',
-      borderRadius: 6,
-      border: '1px solid var(--dsw-alias-border-l1)',
+      padding: 3,
+      boxSizing: 'border-box',
+      background: SOKOBAN_BOARD_BG,
+      borderRadius: 10,
+      border: '1px solid #0b1017',
+      boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.55)',
       overflow: 'hidden',
       touchAction: 'none',
     };
@@ -4129,6 +4136,7 @@ window.__ModuleLoader__.load({
       const boxes = new Set(state.boxes.map(sokobanKey));
 
       const cells = [];
+      const cellRadius = Math.max(3, tile * 0.16);
       for (let r = 0; r < parsed.rows; r += 1) {
         for (let c = 0; c < parsed.cols; c += 1) {
           const key = `${r},${c}`;
@@ -4143,9 +4151,20 @@ window.__ModuleLoader__.load({
               position: 'relative',
               width: tile,
               height: tile,
-              background: isWall ? '#3a3f46' : 'transparent',
+              padding: 1,
               boxSizing: 'border-box',
-              border: isWall ? '1px solid #2b2f35' : 'none',
+            },
+          }, h('div', {
+            key: 'tile',
+            style: {
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              borderRadius: cellRadius,
+              background: isWall ? SOKOBAN_WALL : SOKOBAN_FLOOR,
+              boxShadow: isWall
+                ? 'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 3px rgba(0,0,0,0.28), 0 1px 1px rgba(0,0,0,0.5)'
+                : 'inset 0 2px 4px rgba(0,0,0,0.42), inset 0 -1px 0 rgba(255,255,255,0.035)',
             },
           }, [
             isTarget
@@ -4155,13 +4174,14 @@ window.__ModuleLoader__.load({
                     position: 'absolute',
                     left: '50%',
                     top: '50%',
-                    width: Math.max(4, tile * 0.28),
-                    height: Math.max(4, tile * 0.28),
-                    marginLeft: -Math.max(4, tile * 0.28) / 2,
-                    marginTop: -Math.max(4, tile * 0.28) / 2,
+                    width: Math.max(6, tile * 0.46),
+                    height: Math.max(6, tile * 0.46),
+                    transform: 'translate(-50%, -50%)',
                     borderRadius: '50%',
-                    background: '#ffd166',
-                    opacity: 0.8,
+                    border: '2px dashed #f0a23c',
+                    boxSizing: 'border-box',
+                    background: 'rgba(240, 162, 60, 0.06)',
+                    opacity: 0.92,
                   },
                 })
               : null,
@@ -4170,33 +4190,95 @@ window.__ModuleLoader__.load({
                   key: 'box',
                   style: {
                     position: 'absolute',
-                    left: 2,
-                    top: 2,
-                    right: 2,
-                    bottom: 2,
-                    borderRadius: 3,
-                    background: boxOnTarget ? '#4cd964' : '#c58b4a',
-                    border: '1px solid rgba(0,0,0,0.35)',
-                    boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.35)',
+                    left: Math.max(2, tile * 0.09),
+                    top: Math.max(2, tile * 0.09),
+                    right: Math.max(2, tile * 0.09),
+                    bottom: Math.max(2, tile * 0.09),
+                    borderRadius: Math.max(3, tile * 0.14),
+                    background: 'linear-gradient(180deg, #e3a854 0%, #cf8c36 55%, #b97426 100%)',
+                    border: '1px solid #8a5a1f',
+                    boxShadow: boxOnTarget
+                      ? '0 0 0 1.5px #6fd486, 0 2px 3px rgba(0,0,0,0.45), inset 0 1px 1px rgba(255,240,200,0.5)'
+                      : '0 2px 3px rgba(0,0,0,0.45), inset 0 1px 1px rgba(255,240,200,0.5)',
                   },
-                })
+                }, [
+                  h('div', {
+                    key: 'frame',
+                    style: {
+                      position: 'absolute',
+                      left: 3,
+                      top: 3,
+                      right: 3,
+                      bottom: 3,
+                      border: '1px solid rgba(120,73,20,0.4)',
+                      borderRadius: 3,
+                    },
+                  }),
+                  h('div', {
+                    key: 'grain-h',
+                    style: {
+                      position: 'absolute',
+                      left: '12%',
+                      right: '12%',
+                      top: '50%',
+                      height: 1,
+                      background: 'rgba(110,66,18,0.55)',
+                    },
+                  }),
+                  h('div', {
+                    key: 'grain-v',
+                    style: {
+                      position: 'absolute',
+                      top: '12%',
+                      bottom: '12%',
+                      left: '50%',
+                      width: 1,
+                      background: 'rgba(110,66,18,0.55)',
+                    },
+                  }),
+                ])
               : null,
             isPlayer
               ? h('div', {
                   key: 'player',
                   style: {
                     position: 'absolute',
-                    left: '18%',
-                    top: '18%',
-                    width: '64%',
-                    height: '64%',
+                    left: '16%',
+                    top: '16%',
+                    width: '68%',
+                    height: '68%',
                     borderRadius: '50%',
-                    background: 'radial-gradient(circle at 34% 28%, #9fd0ff 0%, #4aa3ff 45%, #1f6fbf 100%)',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                    background: 'radial-gradient(circle at 36% 30%, #b6e2ff 0%, #74c2f7 35%, #4a9fe0 70%, #2c72b5 100%)',
+                    boxShadow: '0 2px 3px rgba(0,0,0,0.5), inset 0 -2px 3px rgba(0,0,0,0.18)',
                   },
-                })
+                }, [
+                  h('div', {
+                    key: 'eye-l',
+                    style: {
+                      position: 'absolute',
+                      left: '28%',
+                      top: '42%',
+                      width: '15%',
+                      height: '15%',
+                      borderRadius: '50%',
+                      background: '#17212e',
+                    },
+                  }),
+                  h('div', {
+                    key: 'eye-r',
+                    style: {
+                      position: 'absolute',
+                      left: '57%',
+                      top: '42%',
+                      width: '15%',
+                      height: '15%',
+                      borderRadius: '50%',
+                      background: '#17212e',
+                    },
+                  }),
+                ])
               : null,
-          ]));
+          ])));
         }
       }
 
@@ -4217,8 +4299,8 @@ window.__ModuleLoader__.load({
           key: 'board',
           style: {
             ...sokobanBoardStyle,
-            width: parsed.cols * tile,
-            height: parsed.rows * tile,
+            width: parsed.cols * tile + 6,
+            height: parsed.rows * tile + 6,
             gridTemplateColumns: `repeat(${parsed.cols}, ${tile}px)`,
             gridTemplateRows: `repeat(${parsed.rows}, ${tile}px)`,
           },
