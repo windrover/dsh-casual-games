@@ -16,6 +16,13 @@ window.__ModuleLoader__.load({
     // ┌──────────────────────────────────────────────────────────────┐
     // │ Card shell constants and styles                              │
     // └──────────────────────────────────────────────────────────────┘
+    function isTypingTarget() {
+      if (typeof document === 'undefined' || !document.activeElement) return false;
+      const element = document.activeElement;
+      const tag = element.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || element.isContentEditable === true;
+    }
+
     const CARD_WIDTH = 240;
     const GAME_BODY_H = 275;
     const SIDEBAR_HIDDEN_CSS = '[data-sidebar-collapsed] .dshcg-root { display: none !important; }';
@@ -428,6 +435,7 @@ window.__ModuleLoader__.load({
       useEffect(() => {
         if (!focused || !active) return undefined;
         const onKeyDown = (event) => {
+          if (isTypingTarget()) return;
           const directions = {
             ArrowLeft: 'left',
             ArrowRight: 'right',
@@ -949,6 +957,7 @@ window.__ModuleLoader__.load({
       useEffect(() => {
         if (!focused || !active) return undefined;
         const onKeyDown = (event) => {
+          if (isTypingTarget()) return;
           const key = event.key;
           if (!stateRef.current.started) {
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'Spacebar', 'x', 'X', 'p', 'P'].includes(key)) {
@@ -1654,6 +1663,7 @@ window.__ModuleLoader__.load({
       useEffect(() => {
         if (!focused || !active) return undefined;
         const onKeyDown = (event) => {
+          if (isTypingTarget()) return;
           const keys = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
           const step = keys[event.key];
           if (!step) return;
@@ -1886,6 +1896,7 @@ window.__ModuleLoader__.load({
       useEffect(() => {
         if (!focused || !active) return undefined;
         const onKeyDown = (event) => {
+          if (isTypingTarget()) return;
           const key = event.key;
           if (key === 'ArrowLeft' || key === 'a' || key === 'A') { event.preventDefault(); turn(0, -1); return; }
           if (key === 'ArrowRight' || key === 'd' || key === 'D') { event.preventDefault(); turn(0, 1); return; }
@@ -2541,6 +2552,7 @@ window.__ModuleLoader__.load({
           pressed.current.right = false;
         };
         const onKeyDown = (event) => {
+          if (isTypingTarget()) return;
           const key = event.key;
           if (key === 'ArrowLeft' || key === 'a' || key === 'A') {
             event.preventDefault();
@@ -4072,6 +4084,7 @@ window.__ModuleLoader__.load({
       useEffect(() => {
         if (!focused || !active) return undefined;
         const onKeyDown = (event) => {
+          if (isTypingTarget()) return;
           const key = event.key;
           if ((key === 'Enter' || key === 'NumpadEnter') && stateRef.current.solved) {
             event.preventDefault();

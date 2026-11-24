@@ -34,6 +34,10 @@ The card (and its collapsed pill) is hidden via CSS while the shell marks the si
 
 The Host half listens to `agent/status` and serves `GET /api/dsh-casual-games/status` with `{ running, longestMs, longRunning }`. When any agent has been running for more than 3.5 s, the client expands the card once; it resets after the run finishes, and a manual minimize is respected.
 
+## Keyboard handling
+
+Games watch `keydown` on `window` while the card is focused, but every handler returns early when `document.activeElement` is an input, textarea, select or contenteditable — typing in the composer always keeps its arrow keys.
+
 ## Architecture
 
 - Single client module (`client.js`) registered into `shell.overlay`; the card is fixed at `left: 12px; bottom: 72px`, width 240 px, border-only, no scrollbars.
