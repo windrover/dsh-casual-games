@@ -84,7 +84,7 @@ window.__ModuleLoader__.load({
       display: 'flex',
       alignItems: 'center',
       gap: 4,
-      padding: '0 16px 8px 2px',
+      padding: '0 2px 8px',
     };
 
     const iconButtonStyle = {
@@ -5149,6 +5149,37 @@ window.__ModuleLoader__.load({
             'aria-label': '最小化',
             onClick: onCollapse,
           }, '−'),
+          h('div', {
+            key: 'resize',
+            title: '拖动缩放，双击复位',
+            onPointerDown: onResizeDown,
+            onPointerMove: onResizeMove,
+            onPointerUp: endResize,
+            onPointerCancel: endResize,
+            onDoubleClick: () => setScale(1),
+            style: {
+              width: 14,
+              height: 14,
+              marginLeft: 2,
+              flexShrink: 0,
+              cursor: 'nwse-resize',
+              touchAction: 'none',
+              opacity: 0.6,
+              color: 'var(--dsw-alias-label-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            },
+          }, h('svg', {
+            key: 'grip',
+            width: 12,
+            height: 12,
+            viewBox: '0 0 12 12',
+            style: { display: 'block' },
+          }, [
+            h('line', { key: 'a', x1: 1, y1: 1, x2: 11, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
+            h('line', { key: 'b', x1: 5, y1: 1, x2: 11, y2: 7, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
+          ])),
         ]),
         h('div', {
           key: 'games',
@@ -5177,39 +5208,6 @@ window.__ModuleLoader__.load({
           focused,
           active: active === spec.id,
         })))),
-        h('div', {
-          key: 'resize',
-          title: '拖动缩放，双击复位',
-          onPointerDown: onResizeDown,
-          onPointerMove: onResizeMove,
-          onPointerUp: endResize,
-          onPointerCancel: endResize,
-          onDoubleClick: () => setScale(1),
-          style: {
-            position: 'absolute',
-            right: 2,
-            top: 2,
-            width: 14,
-            height: 14,
-            cursor: 'nwse-resize',
-            touchAction: 'none',
-            zIndex: 10,
-            opacity: 0.6,
-            color: 'var(--dsw-alias-label-secondary)',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-          },
-        }, h('svg', {
-          key: 'grip',
-          width: 12,
-          height: 12,
-          viewBox: '0 0 12 12',
-          style: { display: 'block' },
-        }, [
-          h('line', { key: 'a', x1: 11, y1: 1, x2: 1, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
-          h('line', { key: 'b', x1: 11, y1: 5, x2: 5, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
-        ])),
       ]);
     }
 
