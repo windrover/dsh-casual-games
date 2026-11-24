@@ -5188,9 +5188,10 @@ window.__ModuleLoader__.load({
           style: {
             position: 'absolute',
             right: 0,
-            top: 10,
+            top: 0,
             width: 20,
-            height: 22,
+            height: 20,
+            borderTopRightRadius: 12,
             cursor: 'nwse-resize',
             touchAction: 'none',
             zIndex: 10,
