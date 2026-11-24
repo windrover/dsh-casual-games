@@ -65,6 +65,7 @@ const {
   SUDOKU_PUZZLES, SUDOKU_DIFFICULTIES, SUDOKU_PER_LEVEL, sudokuFresh, sudokuIsSolved,
   sudokuPlace, sudokuErase, sudokuToggleNotesMode, sudokuSelect, sudokuNextPuzzle,
   sudokuSetDifficulty, sudokuCompletedDigits, sudokuHighlightDigit, sudokuToggleHighlight, sanitizeSudoku,
+  clampCardScale,
 } = plugin.__internals;
 
 // ┌──────────────────────────────────────────────────────────────┐
@@ -650,6 +651,10 @@ assert.equal(sudokuSetDifficulty(sudokuLast, 'easy').index, 0);
 const sudokuDirty = sanitizeSudoku({ ...sudokuFull, grid: sudokuFull.grid.slice(0, 80) });
 assert.equal(sudokuDirty.grid.length, 81, 'sanitizer rebuilds an invalid grid');
 
-const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 16 };
-const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban + counts.sudoku;
-console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban}, sudoku=${counts.sudoku} (${total} total)`);
+assert.equal(clampCardScale(0.5), 1, 'card scale never shrinks below 1');
+assert.equal(clampCardScale(1.5), 1.5, 'card scale keeps valid values');
+assert.ok(clampCardScale(99) <= 2.2, 'card scale is capped');
+
+const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 16, card: 3 };
+const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban + counts.sudoku + counts.card;
+console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban}, sudoku=${counts.sudoku} card=${counts.card} (${total} total)`);

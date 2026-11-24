@@ -55,6 +55,7 @@ Host 半订阅 `agent/status` 与 `agent/disposed`，记录每个 agent 的连�
 
 ## 布局与状态
 
+- 拖动卡片右下角的小握把可整体缩放（1×–2.2×，写入 localStorage），双击握把复位
 - 侧边栏折叠时（`[data-sidebar-collapsed]`）卡片与折叠胶囊通过 CSS 隐藏
 - 卡片 `position: fixed; left: 12px; bottom: 72px; width: 240px`，仅 1px 主题描边，无滚动条
 - 七款游戏同时挂载，叠放在同一个 CSS Grid 单元里，卡片高度恒为 275px 游戏区，切换不跳动
@@ -65,7 +66,7 @@ Host 半订阅 `agent/status` 与 `agent/disposed`，记录每个 agent 的连�
 
 ```bash
 npm test
-node scripts/verify-games-logic.mjs   # 135 条纯逻辑断言（含推箱子 100 关完整性 + 数独 60 题校验）
+node scripts/verify-games-logic.mjs   # 138 条纯逻辑断言（含推箱子 100 关完整性 + 数独 60 题校验）
 node scripts/smoke-render.mjs         # 极简 hook runtime 渲染冒烟
 node scripts/verify-host-status.mjs   # Host 状态路由
 ```

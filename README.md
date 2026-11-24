@@ -43,6 +43,7 @@ Games watch `keydown` on `window` while the card is focused, but every handler r
 
 - Single client module (`client.js`) registered into `shell.overlay`; the card is fixed at `left: 12px; bottom: 72px`, width 240 px, border-only, no scrollbars.
 - All games stay mounted in one CSS grid cell, so the card height never jumps between games.
+- Drag the small grip in the card's bottom-right corner to zoom the whole card (1×–2.2×, persisted); double-click the grip to reset.
 - State lives in `GameShell` and is persisted to `localStorage['dsh.games.v2']`; each game sanitizes its saved state on mount.
 - Shared host state is served by the tiny `index.js` route above.
 
@@ -51,7 +52,7 @@ Games watch `keydown` on `window` while the card is focused, but every handler r
 ```bash
 npm test
 # or individually
-node scripts/verify-games-logic.mjs   # 135 pure-logic assertions across all games (incl. 60 Sudoku puzzles and a solved board)
+node scripts/verify-games-logic.mjs   # 138 pure-logic assertions across all games (incl. 60 Sudoku puzzles and a solved board)
 node scripts/smoke-render.mjs         # renders components with a minimal hook runtime
 node scripts/verify-host-status.mjs   # host route: running / longRunning / idle / 405
 ```

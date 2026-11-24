@@ -27,6 +27,16 @@ window.__ModuleLoader__.load({
     const GAME_BODY_H = 275;
     const SIDEBAR_HIDDEN_CSS = '[data-sidebar-collapsed] .dshcg-root { display: none !important; }';
     const STORE_KEY = 'dsh.games.v2';
+    const SCALE_KEY = 'dsh.games.scale';
+
+    function clampCardScale(value) {
+      const scale = Number(value);
+      if (!Number.isFinite(scale)) return 1;
+      const vw = typeof window !== 'undefined' && Number(window.innerWidth) ? Number(window.innerWidth) : 1200;
+      const vh = typeof window !== 'undefined' && Number(window.innerHeight) ? Number(window.innerHeight) : 900;
+      const max = Math.max(1, Math.min(2.2, (vw - 24) / CARD_WIDTH, (vh - 150) / 330));
+      return Math.max(1, Math.min(max, scale));
+    }
 
     const cardStyle = {
       position: 'fixed',
@@ -5002,6 +5012,45 @@ window.__ModuleLoader__.load({
 
     function GameCard({ saved, setSaved, focused, setFocused, onCollapse }) {
       const active = GAME_LABELS[saved.active] ? saved.active : '2048';
+      const [scale, setScale] = useState(() => {
+        try {
+          return clampCardScale(window.localStorage.getItem(SCALE_KEY));
+        } catch (error) {
+          return 1;
+        }
+      });
+      const dragRef = useRef(null);
+
+      useEffect(() => {
+        try {
+          window.localStorage.setItem(SCALE_KEY, String(scale));
+        } catch (error) {
+          // best-effort
+        }
+      }, [scale]);
+
+      const onResizeDown = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        dragRef.current = { x: event.clientX, y: event.clientY, scale };
+      };
+
+      const onResizeMove = (event) => {
+        const drag = dragRef.current;
+        if (!drag) return;
+        const next = clampCardScale(drag.scale + (event.clientX - drag.x + event.clientY - drag.y) / 320);
+        setScale(next);
+      };
+
+      const endResize = (event) => {
+        dragRef.current = null;
+        try {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        } catch (error) {
+          // already released
+        }
+      };
 
       const updateGame = useCallback((game, next) => {
         setSaved((prev) => ({ ...prev, active: game, [game]: next }));
@@ -5046,7 +5095,7 @@ window.__ModuleLoader__.load({
 
       return h('div', {
         className: 'dshcg-root',
-        style: cardStyle,
+        style: { ...cardStyle, transform: `scale(${scale})`, transformOrigin: 'bottom left' },
         tabIndex: 0,
         role: 'application',
         'aria-label': `${title} 游戏面板`,
@@ -5128,6 +5177,39 @@ window.__ModuleLoader__.load({
           focused,
           active: active === spec.id,
         })))),
+        h('div', {
+          key: 'resize',
+          title: '拖动缩放，双击复位',
+          onPointerDown: onResizeDown,
+          onPointerMove: onResizeMove,
+          onPointerUp: endResize,
+          onPointerCancel: endResize,
+          onDoubleClick: () => setScale(1),
+          style: {
+            position: 'absolute',
+            right: 2,
+            bottom: 2,
+            width: 14,
+            height: 14,
+            cursor: 'nwse-resize',
+            touchAction: 'none',
+            zIndex: 10,
+            opacity: 0.6,
+            color: 'var(--dsw-alias-label-secondary)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'flex-end',
+          },
+        }, h('svg', {
+          key: 'grip',
+          width: 12,
+          height: 12,
+          viewBox: '0 0 12 12',
+          style: { display: 'block' },
+        }, [
+          h('line', { key: 'a', x1: 11, y1: 4, x2: 4, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
+          h('line', { key: 'b', x1: 11, y1: 8, x2: 8, y2: 11, stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round' }),
+        ])),
       ]);
     }
 
@@ -5249,6 +5331,7 @@ window.__ModuleLoader__.load({
         schulteSlot,
         freshBreakoutState,
         breakoutStep,
+        clampCardScale,
         freshSokobanState,
         sokobanParse,
         sokobanMove,
