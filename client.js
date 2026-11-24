@@ -4607,6 +4607,7 @@ window.__ModuleLoader__.load({
       padding: 2,
       boxSizing: 'border-box',
       background: '#0f1622',
+      color: '#e8eef7',
       border: '1px solid #0a0f16',
       borderRadius: 6,
       boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5)',
@@ -4745,7 +4746,7 @@ window.__ModuleLoader__.load({
             color: wrong
               ? '#ff7b7b'
               : given
-                ? 'var(--dsw-alias-label-primary)'
+                ? '#e8eef7'
                 : '#6cc0ff',
             fontWeight: given ? 700 : 600,
             fontSize: 13,
@@ -4768,7 +4769,7 @@ window.__ModuleLoader__.load({
                   gridTemplateRows: 'repeat(3, 1fr)',
                   fontSize: 5.5,
                   lineHeight: '6px',
-                  color: 'var(--dsw-alias-label-secondary)',
+                  color: '#93a1b5',
                 },
               }, Array.from({ length: 9 }, (_, noteIndex) => h('span', {
                 key: noteIndex,
