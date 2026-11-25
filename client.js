@@ -4509,6 +4509,7 @@ window.__ModuleLoader__.load({
         notesMode: false,
         highlight: true,
         focusDigit: 0,
+        history: [],
         moves: 0,
         solved: false,
       };
@@ -4578,6 +4579,39 @@ window.__ModuleLoader__.load({
       return Math.floor(ar / 3) === Math.floor(br / 3) && Math.floor(ac / 3) === Math.floor(bc / 3);
     }
 
+    function sudokuSnapshot(state) {
+      return {
+        grid: state.grid.slice(),
+        notes: state.notes.map((list) => list.slice()),
+        moves: state.moves,
+        focusDigit: state.focusDigit || 0,
+        selected: state.selected,
+      };
+    }
+
+    function sudokuPushHistory(state) {
+      const history = state.history ? state.history.slice() : [];
+      history.push(sudokuSnapshot(state));
+      return history.slice(-50);
+    }
+
+    function sudokuUndo(state) {
+      const history = state.history ? state.history.slice() : [];
+      if (!history.length) return state;
+      const previous = history.pop();
+      const grid = previous.grid.slice();
+      return {
+        ...state,
+        grid,
+        notes: previous.notes.map((list) => list.slice()),
+        moves: previous.moves,
+        focusDigit: previous.focusDigit,
+        selected: previous.selected,
+        history,
+        solved: sudokuIsSolved(grid, state.solution),
+      };
+    }
+
     function sudokuSelect(state, index) {
       if (!Number.isInteger(index) || index < 0 || index > 80) return state;
       if (state.selected === index) return state;
@@ -4608,7 +4642,13 @@ window.__ModuleLoader__.load({
         const list = notes[index];
         const at = list.indexOf(digit);
         notes[index] = at >= 0 ? list.filter((value) => value !== digit) : [...list, digit].sort((a, b) => a - b);
-        return { ...state, notes, moves: state.moves + 1, focusDigit: digit };
+        return {
+          ...state,
+          notes,
+          moves: state.moves + 1,
+          focusDigit: digit,
+          history: sudokuPushHistory(state),
+        };
       }
       grid[index] = digit;
       notes[index] = [];
@@ -4625,6 +4665,7 @@ window.__ModuleLoader__.load({
         notes,
         moves: state.moves + 1,
         focusDigit: digit,
+        history: sudokuPushHistory(state),
         solved: sudokuIsSolved(grid, state.solution),
       };
     }
@@ -4636,7 +4677,7 @@ window.__ModuleLoader__.load({
       const notes = state.notes.map((list) => list.slice());
       grid[state.selected] = 0;
       notes[state.selected] = [];
-      return { ...state, grid, notes, moves: state.moves + 1 };
+      return { ...state, grid, notes, moves: state.moves + 1, history: sudokuPushHistory(state) };
     }
 
     function sudokuNextPuzzle(state) {
@@ -4708,6 +4749,10 @@ window.__ModuleLoader__.load({
         commit(sudokuErase(stateRef.current), true);
       }, [commit]);
 
+      const undo = useCallback(() => {
+        commit(sudokuUndo(stateRef.current), true);
+      }, [commit]);
+
       const toggleNotes = useCallback(() => {
         commit(sudokuToggleNotesMode(stateRef.current), true);
       }, [commit]);
@@ -4757,6 +4802,11 @@ window.__ModuleLoader__.load({
             toggleNotes();
             return;
           }
+          if (key === 'z' || key === 'Z') {
+            event.preventDefault();
+            undo();
+            return;
+          }
           if (key === 'ArrowLeft') { event.preventDefault(); selectByOffset(0, -1); return; }
           if (key === 'ArrowRight') { event.preventDefault(); selectByOffset(0, 1); return; }
           if (key === 'ArrowUp') { event.preventDefault(); selectByOffset(-1, 0); return; }
@@ -4764,7 +4814,7 @@ window.__ModuleLoader__.load({
         };
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-      }, [focused, active, place, erase, toggleNotes, nextPuzzle, selectByOffset]);
+      }, [focused, active, place, erase, toggleNotes, undo, nextPuzzle, selectByOffset]);
 
       const selected = state.selected;
       const selectedGiven = selected !== null && state.puzzle[selected] !== '0';
@@ -4882,13 +4932,20 @@ window.__ModuleLoader__.load({
             style: { ...sudokuToolStyle(state.notesMode), fontSize: 9, padding: '0 3px' },
           }, '铅笔'),
           h('button', {
-            key: 'eraser',
+            key: 'undo',
             type: 'button',
-            title: '橡皮：清除当前格',
-            'aria-label': '橡皮',
-            onClick: erase,
-            style: { ...sudokuToolStyle(false), fontSize: 9, padding: '0 3px' },
-          }, '橡皮'),
+            title: '撤销上一步（不会清除已有的铅笔记录）',
+            'aria-label': '撤销',
+            onClick: undo,
+            disabled: !(state.history && state.history.length),
+            style: {
+              ...sudokuToolStyle(false),
+              fontSize: 9,
+              padding: '0 3px',
+              opacity: state.history && state.history.length ? 1 : 0.4,
+              cursor: state.history && state.history.length ? 'pointer' : 'default',
+            },
+          }, '撤销'),
           h('button', {
             key: 'highlight',
             type: 'button',
@@ -5372,6 +5429,7 @@ window.__ModuleLoader__.load({
         sudokuCompletedDigits,
         sudokuHighlightDigit,
         sudokuToggleHighlight,
+        sudokuUndo,
         sanitizeSudoku,
       },
     };

@@ -64,7 +64,7 @@ const {
   freshSokobanState, sokobanParse, sokobanMove, sokobanSolved, SOKOBAN_LEVELS,
   SUDOKU_PUZZLES, SUDOKU_DIFFICULTIES, SUDOKU_PER_LEVEL, sudokuFresh, sudokuIsSolved,
   sudokuPlace, sudokuErase, sudokuToggleNotesMode, sudokuSelect, sudokuNextPuzzle,
-  sudokuSetDifficulty, sudokuCompletedDigits, sudokuHighlightDigit, sudokuToggleHighlight, sanitizeSudoku,
+  sudokuSetDifficulty, sudokuCompletedDigits, sudokuHighlightDigit, sudokuToggleHighlight, sudokuUndo, sanitizeSudoku,
   clampCardScale,
 } = plugin.__internals;
 
@@ -645,6 +645,22 @@ const pencilEmpty = sudokuSelect(pencilFocus, sudokuEmpty);
 assert.equal(sudokuHighlightDigit(pencilEmpty), Number(pencilFocus.solution[sudokuGiven]), 'pencil keeps the previous digit highlighted on an empty cell');
 const pencilNote = sudokuPlace(pencilEmpty, 4);
 assert.equal(sudokuHighlightDigit(pencilNote), 4, 'pencilling a candidate highlights that digit');
+
+let undoState = sudokuFresh('easy', 1);
+const undoEmpty = [...undoState.puzzle].findIndex((char) => char === '0');
+undoState = sudokuToggleNotesMode(sudokuSelect(undoState, undoEmpty));
+undoState = sudokuPlace(undoState, 4);
+assert.deepEqual([...undoState.notes[undoEmpty]], [4], 'candidate written');
+const undoNotes = sudokuUndo(undoState);
+assert.deepEqual([...undoNotes.notes[undoEmpty]], [], 'undo removes the candidate');
+assert.equal(undoNotes.history.length, undoState.history.length - 1, 'undo pops one step');
+
+let undoDigit = sudokuSelect(sudokuFresh('easy', 2), [...sudokuFresh('easy', 2).puzzle].findIndex((char) => char === '0'));
+undoDigit = sudokuPlace(undoDigit, Number(undoDigit.solution[undoDigit.selected]));
+const undoPlaced = sudokuUndo(undoDigit);
+assert.equal(undoPlaced.grid[undoPlaced.selected], 0, 'undo removes a placed digit');
+const undoNone = sudokuFresh('easy', 0);
+assert.equal(sudokuUndo(undoNone) === undoNone, true, 'undo with empty history is a no-op');
 assert.equal(sudokuFresh('easy', 0).highlight, true, 'highlight defaults on');
 assert.equal(sudokuToggleHighlight(sudokuFresh('easy', 0)).highlight, false, 'highlight can be turned off');
 assert.equal(sudokuToggleHighlight(sudokuToggleHighlight(sudokuFresh('easy', 0))).highlight, true, 'highlight toggles back');
@@ -661,6 +677,6 @@ assert.equal(clampCardScale(0.5), 1, 'card scale never shrinks below 1');
 assert.equal(clampCardScale(1.5), 1.5, 'card scale keeps valid values');
 assert.ok(clampCardScale(99) <= 2.2, 'card scale is capped');
 
-const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 19, card: 3 };
+const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 23, card: 3 };
 const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban + counts.sudoku + counts.card;
 console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban}, sudoku=${counts.sudoku} card=${counts.card} (${total} total)`);
