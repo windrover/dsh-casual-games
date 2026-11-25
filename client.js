@@ -4788,14 +4788,18 @@ window.__ModuleLoader__.load({
               : (wrong
                 ? 'rgba(255, 90, 90, 0.16)'
                 : (sameDigit
-                  ? '#1a2b3d'
-                  : (noteMatch ? 'rgba(108, 192, 255, 0.05)' : 'transparent'))),
+                  ? (state.notesMode ? 'rgba(108, 192, 255, 0.22)' : '#1a2b3d')
+                  : (noteMatch
+                    ? (state.notesMode ? 'rgba(108, 192, 255, 0.1)' : 'rgba(108, 192, 255, 0.05)')
+                    : 'transparent'))),
             boxShadow: isSelected ? 'inset 0 0 0 1px #7cc7ff' : 'none',
             color: wrong
               ? '#ff7b7b'
               : (isSelected
                 ? '#f2f8ff'
-                : (sameDigit ? '#9cc7e6' : (given ? '#e8eef7' : '#6cc0ff'))),
+                : (sameDigit
+                  ? (state.notesMode ? '#d6efff' : '#9cc7e6')
+                  : (given ? '#e8eef7' : '#6cc0ff'))),
             fontWeight: given ? 700 : 600,
             fontSize: 13,
             lineHeight: 1,
