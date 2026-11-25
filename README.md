@@ -12,7 +12,7 @@ Nine tiny games docked at the bottom-left of the [DeepSeek Harness](https://gith
 | **Klotski** | Select a block, then click a target cell or use arrow keys. Put Cao Cao on the bottom-centre exit to win. |
 | **Snake** | Arrow keys / `WASD`, `P` pause, `Space` restart. |
 | **Schulte table** | Tap 1→25 in order. Progress / time / best are shown; the remaining numbers reshuffle every 4 s. The board can be a square grid or a rotating circle (numbers stay upright). |
-| **Sudoku** | 9×9 grid, three difficulties with 20 puzzles each (60 total). Select a cell, tap 1–9, toggle `✎ Pencil` for candidate marks and `⌫ Eraser` to clear; arrow keys move the selection, `N` toggles pencil. Selecting a filled cell highlights every matching digit on the board (with a `高亮` toggle to switch that off); a number button greys out once all nine of that digit are correctly placed. |
+| **Sudoku** | 9×9 grid, three difficulties with 20 puzzles each (60 total). Select a cell, tap 1–9, toggle `✎ Pencil` for candidate marks and `⌫ Eraser` to clear; arrow keys move the selection, `N` toggles pencil. Selecting a filled cell highlights every matching digit on the board; with the pencil active the highlight follows the focused digit even after moving to an empty cell (and a `高亮` toggle switches this off); a number button greys out once all nine of that digit are correctly placed. |
 | **Sokoban** | Classic 100-level Sokoban pack (16×16 XSB-style maps). Arrow keys / `WASD` walk and push, `R` resets the level; press `Enter` after clearing a level to advance (the overlay button still works). |
 | **Breakout** | Drag the paddle with the mouse/touch (pointer capture keeps it following outside the field), or hold `←` `→` / `A` `D`. `Space` serves, `P` pauses. Six staggered rows of bricks. |
 
@@ -52,7 +52,7 @@ Games watch `keydown` on `window` while the card is focused, but every handler r
 ```bash
 npm test
 # or individually
-node scripts/verify-games-logic.mjs   # 138 pure-logic assertions across all games (incl. 60 Sudoku puzzles and a solved board)
+node scripts/verify-games-logic.mjs   # 141 pure-logic assertions across all games (incl. 60 Sudoku puzzles and a solved board)
 node scripts/smoke-render.mjs         # renders components with a minimal hook runtime
 node scripts/verify-host-status.mjs   # host route: running / longRunning / idle / 405
 ```

@@ -4508,6 +4508,7 @@ window.__ModuleLoader__.load({
         selected: null,
         notesMode: false,
         highlight: true,
+        focusDigit: 0,
         moves: 0,
         solved: false,
       };
@@ -4539,6 +4540,8 @@ window.__ModuleLoader__.load({
       });
       base.moves = Number(state.moves) || 0;
       base.highlight = state.highlight !== false;
+      const focus = Number(state.focusDigit);
+      base.focusDigit = Number.isInteger(focus) && focus >= 1 && focus <= 9 ? focus : 0;
       base.solved = sudokuIsSolved(base.grid, base.solution);
       return base;
     }
@@ -4555,9 +4558,15 @@ window.__ModuleLoader__.load({
     }
 
     function sudokuHighlightDigit(state) {
-      if (!state || state.selected === null) return 0;
-      const digit = state.grid[state.selected];
-      return digit >= 1 && digit <= 9 ? digit : 0;
+      if (!state) return 0;
+      if (state.selected !== null) {
+        const digit = state.grid[state.selected];
+        if (digit >= 1 && digit <= 9) return digit;
+      }
+      // While pencilling, keep the last focused digit highlighted even after
+      // moving to an empty cell, so candidates can be compared across the board.
+      if (state.notesMode) return state.focusDigit || 0;
+      return 0;
     }
 
     function sudokuPeer(a, b) {
@@ -4572,7 +4581,11 @@ window.__ModuleLoader__.load({
     function sudokuSelect(state, index) {
       if (!Number.isInteger(index) || index < 0 || index > 80) return state;
       if (state.selected === index) return state;
-      return { ...state, selected: index };
+      const digit = state.grid[index];
+      let focusDigit = state.focusDigit || 0;
+      if (digit >= 1 && digit <= 9) focusDigit = digit;
+      else if (!state.notesMode) focusDigit = 0;
+      return { ...state, selected: index, focusDigit };
     }
 
     function sudokuToggleNotesMode(state) {
@@ -4595,7 +4608,7 @@ window.__ModuleLoader__.load({
         const list = notes[index];
         const at = list.indexOf(digit);
         notes[index] = at >= 0 ? list.filter((value) => value !== digit) : [...list, digit].sort((a, b) => a - b);
-        return { ...state, notes, moves: state.moves + 1 };
+        return { ...state, notes, moves: state.moves + 1, focusDigit: digit };
       }
       grid[index] = digit;
       notes[index] = [];
@@ -4611,6 +4624,7 @@ window.__ModuleLoader__.load({
         grid,
         notes,
         moves: state.moves + 1,
+        focusDigit: digit,
         solved: sudokuIsSolved(grid, state.solution),
       };
     }

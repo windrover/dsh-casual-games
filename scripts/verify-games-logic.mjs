@@ -638,7 +638,13 @@ const sudokuGiven = [...sudoku.puzzle].findIndex((char) => char !== '0');
 assert.ok(sudokuGiven >= 0, 'puzzle has a given');
 const highlighted = sudokuSelect(sudoku, sudokuGiven);
 assert.equal(sudokuHighlightDigit(highlighted), Number(highlighted.solution[sudokuGiven]), 'selecting a given highlights its digit');
-assert.equal(sudokuHighlightDigit(sudokuSelect(sudoku, sudokuEmpty)), 0, 'an empty cell highlights nothing');
+assert.equal(sudokuHighlightDigit(sudokuSelect(sudoku, sudokuEmpty)), 0, 'an empty cell highlights nothing in normal mode');
+
+const pencilFocus = sudokuToggleNotesMode(sudokuSelect(sudoku, sudokuGiven));
+const pencilEmpty = sudokuSelect(pencilFocus, sudokuEmpty);
+assert.equal(sudokuHighlightDigit(pencilEmpty), Number(pencilFocus.solution[sudokuGiven]), 'pencil keeps the previous digit highlighted on an empty cell');
+const pencilNote = sudokuPlace(pencilEmpty, 4);
+assert.equal(sudokuHighlightDigit(pencilNote), 4, 'pencilling a candidate highlights that digit');
 assert.equal(sudokuFresh('easy', 0).highlight, true, 'highlight defaults on');
 assert.equal(sudokuToggleHighlight(sudokuFresh('easy', 0)).highlight, false, 'highlight can be turned off');
 assert.equal(sudokuToggleHighlight(sudokuToggleHighlight(sudokuFresh('easy', 0))).highlight, true, 'highlight toggles back');
@@ -655,6 +661,6 @@ assert.equal(clampCardScale(0.5), 1, 'card scale never shrinks below 1');
 assert.equal(clampCardScale(1.5), 1.5, 'card scale keeps valid values');
 assert.ok(clampCardScale(99) <= 2.2, 'card scale is capped');
 
-const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 16, card: 3 };
+const counts = { '2048': 25, tetris: 23, gomoku: 17, klotski: 9, snake: 10, schulte: 16, breakout: 11, sokoban: 8, sudoku: 19, card: 3 };
 const total = counts['2048'] + counts.tetris + counts.gomoku + counts.klotski + counts.snake + counts.schulte + counts.breakout + counts.sokoban + counts.sudoku + counts.card;
 console.log(`Logic verification passed: 2048=${counts['2048']}, tetris=${counts.tetris}, gomoku=${counts.gomoku}, klotski=${counts.klotski}, snake=${counts.snake}, schulte=${counts.schulte}, breakout=${counts.breakout}, sokoban=${counts.sokoban}, sudoku=${counts.sudoku} card=${counts.card} (${total} total)`);
