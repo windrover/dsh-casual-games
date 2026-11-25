@@ -1,6 +1,6 @@
 {
   "name": "dsh-casual-games",
-  "version": "1.5.8",
+  "version": "1.5.9",
   "description": "Nine mini-games docked in the DeepSeek Harness sidebar: 2048, Tetris, Gomoku, Klotski, Snake, Schulte table, Breakout, Sokoban and Sudoku.",
   "type": "module",
   "license": "MIT",

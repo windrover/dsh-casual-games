@@ -4852,9 +4852,9 @@ window.__ModuleLoader__.load({
               : (wrong
                 ? 'rgba(255, 90, 90, 0.16)'
                 : (sameDigit
-                  ? (state.notesMode ? 'rgba(108, 192, 255, 0.22)' : '#244058')
+                  ? (state.notesMode ? 'rgba(108, 192, 255, 0.27)' : '#244058')
                   : (noteMatch
-                    ? (state.notesMode ? 'rgba(108, 192, 255, 0.1)' : 'rgba(108, 192, 255, 0.05)')
+                    ? (state.notesMode ? 'rgba(108, 192, 255, 0.12)' : 'rgba(108, 192, 255, 0.05)')
                     : 'transparent'))),
             boxShadow: isSelected ? 'inset 0 0 0 1px #7cc7ff' : 'none',
             color: wrong
@@ -4862,7 +4862,7 @@ window.__ModuleLoader__.load({
               : (isSelected
                 ? '#f2f8ff'
                 : (sameDigit
-                  ? (state.notesMode ? '#d6efff' : '#b9ddf8')
+                  ? (state.notesMode ? '#e0f4ff' : '#b9ddf8')
                   : (given ? '#e8eef7' : '#6cc0ff'))),
             fontWeight: given ? 700 : 600,
             fontSize: 13,
